@@ -1,0 +1,300 @@
+PRODUCT REQUIREMENTS DOCUMENT
+Aplikasi Pemilihan Ketua OSIS
+SMPN 13 Penajam Paser Utara
+Versi: 1.0
+Target Eksekusi: Antigravity / AI Coding Agent
+Batas Waktu Pemilu: Acara sekolah, ± 1 hari
+________________________________________
+1. Ringkasan Produk
+Aplikasi web untuk pemilihan Ketua OSIS SMPN 13 Penajam Paser Utara secara online, digunakan oleh ± 400 siswa pemilih dari 10 laptop bersamaan, dengan panel admin, layar quick count real-time terpisah, dan dashboard analitik. Aplikasi harus ringan, stabil di koneksi sekolah, dan memiliki tampilan yang elegan dan profesional setara produk enterprise, bukan tampilan dekoratif bertema "AI generik".
+________________________________________
+2. Tujuan dan Metrik Keberhasilan
+Tujuan	Metrik
+Pemungutan suara cepat & anti-double	0 duplikasi suara; 1 NISN = 1 suara
+Admin dapat mengelola paslon & pemilih mandiri	Import CSV 400 baris < 5 detik
+Hasil transparan	Quick count akurat, latensi < 5 detik
+Analisis pasca-pemilu	Laporan partisipasi per kelas, per paslon, tren per jam
+Ringan untuk 10 laptop concurrent	Beban < 100 KB per halaman (non-analytics)
+________________________________________
+3. Pengguna dan Peran
+Pemilih (Siswa) — anonim. Hanya perlu NISN. Tidak ada login, tidak ada akun. Satu NISN hanya bisa memilih sekali.
+Admin (Guru) — satu akun. Login hanya dengan sandi guru13. Akses penuh ke kontrol pemilu, data paslon, data pemilih, quick count, dan analitik.
+Tidak ada role lain. Tidak ada registrasi publik.
+________________________________________
+4. Arsitektur Teknis
+Lapisan	Teknologi	Catatan
+Frontend hosting	GitHub Pages	File statis, HTTPS otomatis
+Frontend stack	HTML + CSS + Vanilla JS	Tanpa framework; hindari bundle berat
+Database & Backend	Supabase (PostgreSQL, free tier)	Singapore region
+Backend logic	Supabase RPC (PL/pgSQL, SECURITY DEFINER)	Semua akses via RPC; RLS deny-all langsung
+Chart library	Chart.js 4 via CDN	Hanya di halaman analitik
+CSV parser	PapaParse via CDN	Hanya di halaman admin
+Supabase SDK	@supabase/supabase-js@2 via CDN	Semua halaman
+Batasan operasional: 10 laptop concurrent, ± 400 pemilih, maksimal 5 paslon, durasi pemungutan ± 4 jam.
+________________________________________
+5. Skema Database dan API
+5.1 Tabel
+text
+election_config   (id=1, is_open, admin_password bcrypt, election_title, started_at, closed_at, updated_at)
+candidates        (id, number, name, chairman, vice_chairman, photo_url, vision, mission, created_at)
+voters            (id, nisn UNIQUE, name, class, has_voted, voted_at, created_at)
+votes             (id, candidate_id FK, voter_nisn FK, voted_at)
+admin_sessions    (token UUID PK, created_at, expires_at)
+5.2 RPC Endpoints
+Semua endpoint mengembalikan bentuk { ok: boolean, data?: any, error?: string }.
+Publik (tanpa token admin):
+•	check_nisn(p_nisn text) — verifikasi NISN ada, belum memilih, pemilu sedang dibuka
+•	get_candidates() — daftar paslon untuk halaman voting
+•	cast_vote(p_nisn text, p_candidate_id bigint) — transaksional; lock row voter; tolak jika sudah memilih
+Admin (butuh p_token uuid):
+•	admin_login(p_password text) — return token sesi, berlaku 8 jam
+•	admin_get_config, admin_toggle_election(p_open)
+•	admin_get_candidates, admin_save_candidate, admin_delete_candidate
+•	admin_import_voters(p_voters json), admin_get_voters(p_limit, p_offset, p_search), admin_delete_voter
+•	admin_reset_votes — hapus semua suara dan reset status pemilih
+•	admin_quick_count — data agregat ringan untuk polling
+•	admin_analytics — data agregat lengkap untuk dashboard
+5.3 Aturan Integritas
+•	Password admin di-hash dengan crypt(p, gen_salt('bf')).
+•	cast_vote menggunakan SELECT ... FOR UPDATE pada row voter untuk mencegah race condition.
+•	Semua tabel mengaktifkan Row Level Security tanpa policy = akses langsung via anon key ditolak. Hanya RPC yang berjalan.
+________________________________________
+6. Design System
+Prinsip desain: Tenang, rapi, terstruktur. Tidak ada dekorasi tanpa fungsi. Tidak ada emoji. Tidak ada gradient meriah. Tampilan mengikuti konvensi dashboard institusional, bukan landing page SaaS.
+6.1 Palet Warna
+Nama	Hex	Penggunaan
+Papaya Whip	#fdf0d5	Latar utama (voting & admin), card background contrast
+Deep Space Blue	#003049	Teks utama, header admin, grafik
+Molten Lava	#780000	Judul utama, aksen kuat, warning
+Brick Red	#c1121f	Tombol primary, badge state, leader highlight
+Steel Blue	#669bbc	Tombol secondary, garis bantu, chart series
+Aturan warna: Setiap halaman hanya boleh menggunakan maksimal 3 warna dari palet secara bersamaan (di luar teks). Tidak boleh membuat gradient multi-warna. Background tidak boleh lebih dari satu radial gradient tipis (opacity < 0.1).
+6.2 Tipografi
+•	Display & heading: Fraunces (Google Fonts), weight 600–700, letter-spacing -0.02em. Memberi karakter editorial dan premium.
+•	Body & UI: Inter (Google Fonts), weight 400–600.
+•	Angka besar (quick count, stat card): Fraunces tabular variant atau Inter weight 700 dengan font-feature-settings: "tnum".
+Skala:
+•	Display: 48px / line-height 1.1
+•	H1: 32px / 1.2
+•	H2: 24px / 1.3
+•	H3: 18px / 1.4
+•	Body: 16px / 1.6
+•	Small: 14px / 1.5
+•	Micro: 12px / 1.4, uppercase, letter-spacing 0.08em
+6.3 Spasi dan Layout
+•	Grid 4px base: 4, 8, 12, 16, 24, 32, 48, 64.
+•	Container max-width: 1120px (admin, analytics), 960px (voting NISN), full-bleed (quick count).
+•	Padding halaman: 24px mobile, 48px desktop.
+6.4 Komponen Dasar
+Tombol
+•	Primary: background #c1121f, teks putih, radius 8px, padding 12/24, weight 600, tanpa shadow default. Hover: background #780000. Active: transform: scale(0.98).
+•	Secondary: border 1px #003049 pada latar transparan, teks #003049. Hover: background #003049, teks putih.
+•	Ghost: tanpa border, teks #003049 underline saat hover.
+•	Danger: background #780000, teks putih.
+Card
+•	Background putih, border 1px #e7dfce, radius 12px, padding 24px, tanpa shadow default. Hanya gunakan shadow tipis (0 1px 2px rgba(0,48,73,0.06)) atau tanpa sama sekali.
+Input
+•	Border 1px #d6cdb8, radius 8px, padding 12/16, background putih. Focus: border #669bbc 2px, tanpa glow.
+Badge status
+•	Bentuk persegi (radius 4px), padding 2/8, teks 12px uppercase tracking 0.05em.
+•	"Sudah memilih": background #e8f4ec, teks #1e6b3a.
+•	"Belum memilih": background #f4e8e8, teks #780000.
+6.5 Motion
+•	Durasi standar: 200ms untuk micro-interaction, 300ms untuk transisi halaman.
+•	Easing: cubic-bezier(0.22, 1, 0.36, 1) untuk masuk, ease-out untuk keluar.
+•	Animasi diperbolehkan: fade-in card dengan stagger 40ms, transisi slide halaman voting, hover translate 2px pada card paslon, progress bar quick count yang bertransisi lebar.
+•	Dilarang: bounce, shake, pulse, glow, confetti, animated gradient, animated background, loading spinner dekoratif, animated emoji/SVG.
+6.6 Yang Harus Dihindari (Anti AI-Slop)
+Instruksi eksplisit untuk coding agent:
+•	Tidak ada emoji di mana pun — tidak di tombol, tidak di judul, tidak di toast, tidak di empty state. Gunakan teks biasa atau ikon SVG garis 1.5px monokrom jika benar-benar perlu.
+•	Tidak ada gradient di tombol, card, atau badge.
+•	Tidak ada glassmorphism, backdrop-blur, atau frosted glass.
+•	Tidak ada shadow bertumpuk (multi-layer). Maksimal satu shadow tipis.
+•	Tidak ada icon library penuh (FontAwesome, Heroicons full set) — hanya SVG inline untuk ikon esensial.
+•	Tidak ada ilustrasi dekoratif, blob SVG, atau pattern background.
+•	Tidak ada animasi pada scroll.
+•	Tidak ada "hero section" bertingkat dengan CTA ganda di halaman voting.
+•	Tidak ada copywriting berlebihan seperti "Selamat datang di masa depan pemilihan!" — gunakan bahasa netral formal.
+•	Border radius konsisten (8px untuk input, 12px untuk card, 999px untuk badge bulat). Jangan campur radius acak.
+•	Konsisten warna: jangan menambahkan warna di luar palet meski hanya untuk status/error. Error gunakan #780000, success gunakan hijau gelap #1e6b3a (satu-satunya pengecualian).
+________________________________________
+7. Alur Halaman
+text
+[index.html]  NISN -> Pilih Paslon -> Konfirmasi -> Terima Kasih -> Reset ke NISN
+[admin.html]  Login -> Tab Kontrol | Paslon | Pemilih | Tautan
+[quickcount.html]  Read-only layar real-time (butuh token admin di sessionStorage)
+[analytics.html]   Read-only dashboard (butuh token admin di sessionStorage)
+Sesi admin disimpan di sessionStorage (bukan localStorage) — hilang saat tab ditutup.
+________________________________________
+8. Spesifikasi Halaman
+8.1 Halaman Voting — index.html
+Struktur (single page, 2 layar):
+Layar 1 — Input NISN
+•	Judul display serif "Pemilihan Ketua OSIS" di atas, subjudul kecil "SMPN 13 Penajam Paser Utara".
+•	Card tunggal terpusat, lebar maksimal 420px.
+•	Input NISN (numerik, font-size 20px, teks tengah), tombol "Masuk".
+•	Pesan error inline di bawah input (bukan alert).
+•	Enter pada input = submit.
+•	Jika pemilu tertutup: input disabled, pesan "Pemilihan belum dibuka" atau "Pemilihan telah ditutup" sesuai is_open.
+Layar 2 — Pilih Paslon
+•	Header ringkas: nama pemilih + kelas (badge) sebagai konteks, tombol "Kembali" di kanan.
+•	Grid card paslon: repeat(auto-fit, minmax(280px, 1fr)), gap 24px.
+•	Setiap card berisi:
+o	Nomor urut — ditampilkan sebagai label kotak kecil di atas nama (PASLON 01), bukan lingkaran overlay dekoratif.
+o	Foto paslon, aspect-ratio 4:3, object-fit: cover, background #f3eada sebagai placeholder.
+o	Nama paslon (H3, serif), nama ketua & wakil (small, muted).
+o	Visi (micro uppercase label, isi 2–3 baris dengan line-clamp, scroll internal).
+o	Misi (sama).
+o	Tombol "Pilih Paslon Ini" full width di bawah.
+•	Hover card: translateY(-2px), border tipis #c1121f.
+Dialog Konfirmasi (overlay, bukan alert/confirm native)
+•	Background overlay rgba(0,48,73,0.55) tanpa blur.
+•	Card putih terpusat, max-width 400px.
+•	Judul "Konfirmasi Pilihan", teks "Anda akan memilih [nama]. Pilihan tidak dapat diubah."
+•	Tombol Batal (secondary) + "Ya, Konfirmasi" (primary).
+Dialog Terima Kasih
+•	Card putih terpusat. Judul serif "Terima Kasih".
+•	Teks: "Suara Anda telah tercatat."
+•	Progress bar 5 detik yang menyusut (bukan angka besar dekoratif). Teks kecil "Kembali ke halaman utama dalam 5 detik".
+•	Setelah 5 detik: reset state, kembali ke Layar 1 dengan input kosong.
+Batasan: Jika cast_vote gagal (jaringan/timeout), tampilkan toast error "Koneksi terputus. Silakan coba lagi." Jangan disable tombol konfirmasi lebih dari 3 detik.
+________________________________________
+8.2 Halaman Admin — admin.html
+Login
+•	Card terpusat, judul "Panel Admin". Input password, tombol "Masuk".
+•	Tidak ada username. Tidak ada "lupa sandi".
+•	Tautan kecil kembali ke halaman voting di bawah.
+Layout setelah login
+•	Topbar sticky: judul "Panel Admin — Pemilihan OSIS" di kiri, navigasi tab di kanan (horizontal scroll pada mobile).
+•	Tab: Kontrol, Paslon, Pemilih, Tautan, Keluar.
+•	Konten tab padding 32px vertikal.
+Tab Kontrol
+•	3 stat card berjajar: Status (DIBUKA/DITUTUP), Total Pemilih, Sudah Memilih.
+•	Card kontrol: dua tombol "Buka Pemilihan" / "Tutup Pemilihan" (satu disabled sesuai state). Di sisi kanan, tombol "Reset Semua Suara" bergaya danger, dengan dialog konfirmasi ganda (dua step).
+Tab Paslon
+•	Header dengan tombol "+ Tambah Paslon".
+•	Daftar paslon sebagai baris card (bukan grid): foto thumbnail 80×80, nama + nomor, ketua/wakil, ringkasan visi, tombol Edit & Hapus di kanan.
+•	Dialog form: field nomor, nama, ketua, wakil, URL foto, visi, misi. Validasi wajib: nomor dan nama.
+Tab Pemilih
+•	Card import CSV: input file, tombol "Import". Format: nisn,name,class (header baris pertama).
+•	Card daftar pemilih: search field, tabel dengan kolom NISN / Nama / Kelas / Status / Aksi (Hapus).
+•	Pagination 50 baris per halaman, tombol Prev/Next.
+•	Status pemilih sebagai badge.
+Tab Tautan
+•	Dua card link besar ke quickcount.html dan analytics.html, keduanya buka tab baru. Deskripsi singkat di bawah masing-masing.
+•	Tidak ada tombol salin-link, tidak ada QR code.
+________________________________________
+8.3 Halaman Quick Count — quickcount.html
+Peruntukan: ditampilkan di proyektor terpisah. Read-only, butuh sesi admin. Jika tidak ada sesi, redirect ke admin.html.
+Layout
+•	Full screen, padding 48px. Latar #003049 (Deep Space Blue) untuk kontras proyektor.
+•	Header:
+o	Judul serif "Hasil Sementara" (warna putih).
+o	Subjudul "Pemilihan Ketua OSIS SMPN 13 Penajam Paser Utara".
+o	Baris kecil: indikator "LIVE" dengan dot hijau kecil dan teks "Diperbarui otomatis" — bukan "LIVE — diperbarui tiap 3 detik" yang terlalu teknis.
+o	Metrik: Suara masuk 128 / 400 · Partisipasi 32.0% dalam satu baris.
+Grid Card Paslon
+•	Horizontal atau grid repeat(auto-fit, minmax(220px, 1fr)), gap 24px.
+•	Setiap card:
+o	Background rgba(255,255,255,0.06), border 1px rgba(255,255,255,0.14), radius 12px. Tanpa backdrop-blur.
+o	Label kecil "PASLON 01" (uppercase).
+o	Nama paslon (serif, 20px, putih).
+o	Angka suara besar (serif, 56px, putih). Bertransisi warna singkat saat bertambah (300ms dari putih ke #fdf0d5, tanpa scale).
+o	Persentase kecil (steel blue).
+o	Progress bar horizontal 4px tinggi, fill #669bbc.
+o	Card dengan suara terbanyak: border 1px #c1121f + label kecil "TERBANYAK" di atas. Tidak ada ikon mahkota.
+Polling: setiap 3 detik memanggil admin_quick_count. Tidak ada WebSocket (untuk simplisitas dan reliability di jaringan sekolah).
+Penanganan error: jika polling gagal 3 kali berturut-turut, tampilkan banner kecil di atas: "Koneksi terputus. Mencoba lagi..." dan lanjut polling.
+________________________________________
+8.4 Halaman Analitik — analytics.html
+Peruntukan: untuk guru menganalisis hasil setelah/selama pemungutan. Read-only, butuh sesi admin.
+Layout
+•	Topbar sama seperti admin, dengan tombol "Muat Ulang Data". Tidak ada auto-refresh (analitik bukan real-time).
+•	4 stat card di atas: Total Pemilih, Sudah Memilih, Belum Memilih, Tingkat Partisipasi (%).
+•	Grid 2×2 chart card:
+1.	Perolehan Suara per Paslon — bar chart horizontal atau vertikal, warna per bar dari palet.
+2.	Partisipasi per Kelas — stacked bar: sudah/belum per kelas.
+3.	Suara per Kelas & Paslon — stacked bar per kelas dipecah per paslon.
+4.	Tren Suara per Jam — line chart dengan area fill opacity rendah.
+Aturan chart (Chart.js):
+•	Font: Inter 12px, warna sumbu #003049.
+•	Grid: horizontal only, rgba(0,48,73,0.08).
+•	Legend: hanya saat ada > 1 dataset, posisi bottom, box width 12px.
+•	Tanpa animasi saat load pertama lebih dari 400ms; tanpa animasi pada refresh.
+•	Nilai Y axis selalu mulai dari 0.
+________________________________________
+9. Persyaratan Non-Fungsional
+Kategori	Persyaratan
+Performa	Halaman voting & quick count < 100 KB (di luar font). Time-to-interactive < 2s pada 4G.
+Kompatibilitas	Chrome, Edge, Firefox versi terkini. Mobile responsive minimal 360px width (untuk admin saja; voting diutamakan desktop).
+Ketersediaan	Untuk 10 laptop concurrent, tidak boleh ada request > 2s.
+Aksesibilitas	Kontras teks minimal WCAG AA (4.5:1). Input punya <label> atau aria-label. Dialog fokus terperangkap pada elemen aktif.
+Bahasa	Seluruh teks antarmuka dalam Bahasa Indonesia formal. Tidak ada bahasa campur.
+Font loading	Gunakan font-display: swap untuk Fraunces dan Inter.
+________________________________________
+10. Keamanan
+•	Password admin hanya disimpan sebagai bcrypt hash di database.
+•	Anon key Supabase boleh terekspos di frontend (normal untuk Supabase) karena semua akses dikontrol RPC + RLS deny-all.
+•	Token admin disimpan di sessionStorage, dihapus saat tab ditutup atau tombol "Keluar".
+•	RPC admin memvalidasi token lewat helper _is_admin(p_token) sebelum aksi.
+•	cast_vote mencegah double vote dengan SELECT ... FOR UPDATE.
+•	NISN tidak di-log ke console di production.
+________________________________________
+11. Deployment
+1.	Buat repo GitHub publik: osis-smpn13.
+2.	Upload semua file. Aktifkan GitHub Pages (branch main, root).
+3.	Buat proyek Supabase, jalankan SQL schema lewat SQL Editor.
+4.	Isi js/config.js dengan SUPABASE_URL dan SUPABASE_ANON_KEY.
+5.	Commit ulang. Akses via https://{username}.github.io/osis-smpn13/.
+6.	Untuk mengganti sandi admin: jalankan SQL UPDATE election_config SET admin_password = crypt('sandiBaru', gen_salt('bf')) WHERE id = 1;.
+________________________________________
+12. Kriteria Penerimaan
+•	□ 
+Halaman voting menerima NISN, menampilkan maksimal 5 paslon dengan foto, visi, misi.
+•	□ 
+NISN yang sama tidak bisa memilih dua kali meski dari laptop berbeda secara simultan.
+•	□ 
+Setelah konfirmasi, muncul dialog terima kasih dengan countdown 5 detik yang mengembalikan ke input NISN.
+•	□ 
+Admin bisa login hanya dengan sandi guru13.
+•	□ 
+Admin bisa import CSV 400 baris dan melihat daftar pemilih dengan pencarian dan paginasi.
+•	□ 
+Admin bisa membuka/menutup pemilihan, menambah/edit/hapus paslon.
+•	□ 
+Quick count menampilkan angka yang bertambah otomatis dalam ≤ 5 detik setelah suara masuk.
+•	□ 
+Dashboard analitik menampilkan 4 chart dan 4 stat card sesuai spesifikasi.
+•	□ 
+Tidak ada emoji di seluruh antarmuka.
+•	□ 
+Tidak ada gradient pada tombol, card, atau background halaman.
+•	□ 
+Tidak ada efek glassmorphism atau backdrop-blur di halaman mana pun.
+•	□ 
+Font yang dipakai sesuai spesifikasi (Fraunces untuk display, Inter untuk body).
+•	□ 
+Semua warna yang muncul berasal dari palet 5 warna + satu exception hijau status.
+•	□ 
+Aplikasi berjalan di GitHub Pages tanpa error console di halaman voting.
+________________________________________
+13. Di Luar Lingkup
+•	Multi-admin atau multi-role.
+•	Autentikasi via NISN + tanggal lahir.
+•	WebSocket / Supabase Realtime channel.
+•	Export PDF atau Excel dari dashboard analitik.
+•	Notifikasi email atau WhatsApp.
+•	Audit log aktivitas admin.
+•	Two-factor authentication.
+•	Dark mode.
+•	Multibahasa.
+Fitur-fitur ini dapat ditambahkan pada iterasi berikutnya jika diminta secara eksplisit.
+________________________________________
+14. Catatan untuk Coding Agent
+•	Prioritas utama: fungsionalitas dan keandalan di atas estetika. Estetika harus dicapai melalui tipografi, spasi, dan hirarki — bukan dekorasi.
+•	Rujuk Design System Bagian 6 setiap kali membuat komponen. Jangan improvisasi warna, radius, atau shadow.
+•	Rujuk Bagian 6.6 setiap kali tergoda menambahkan elemen visual. Jika ragu, hapus.
+•	Bahasa Indonesia formal. Hindari kata "yuk", "sih", "banget", atau tanda seru ganda.
+•	Konsisten bentuk respons RPC. Selalu cek data.ok sebelum menggunakan data.data.
+•	Uji dengan data dummy minimal: 5 paslon, 400 pemilih tersebar di 12 kelas, 200 suara masuk. Pastikan tidak ada error console di seluruh halaman.
+

@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quick Count Real-Time — Pemilihan Ketua & Wakil Ketua OSIS SMPN 13 PPU</title>
+  <meta name="description" content="Hasil hitung cepat (Quick Count) pemilihan Ketua dan Wakil Ketua OSIS SMPN 13 Penajam Paser Utara secara real-time dan interaktif." />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,800&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       QUICK COUNT PREMIUM — COMMAND CENTER & PROJECTOR DISPLAY
+       ========================================================================== */
+    :root {
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Fraunces', Georgia, serif;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #0d283e 0%, #031522 60%, #010a12 100%);
+      --paslon1-primary: #e63946;
+      --paslon1-glow: rgba(230, 57, 70, 0.4);
+      --paslon2-primary: #00b4d8;
+      --paslon2-glow: rgba(0, 180, 216, 0.4);
+      --paslon3-primary: #2a9d8f;
+      --paslon3-glow: rgba(42, 157, 143, 0.4);
+      --gold-leader: #ffb703;
+      --gold-glow: rgba(255, 183, 3, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: #ffffff;
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient glowing background blobs */
+    .ambient-glow-1 {
+      position: fixed;
+      top: -100px;
+      left: 10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(230,57,70,0.15) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(60px);
+    }
+    .ambient-glow-2 {
+      position: fixed;
+      top: -100px;
+      right: 10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(0,180,216,0.15) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(60px);
+    }
+
+    .qc-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ─── Top Header Bar ────────────────────────────────────────── */
+    .qc-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .qc-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .qc-emblem {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .qc-emblem svg {
+      width: 28px;
+      height: 28px;
+      fill: none;
+      stroke: var(--paslon2-primary);
+      stroke-width: 2;
+    }
+
+    .qc-title-group h1 {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .qc-title-group p {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.65);
+      font-weight: 500;
+    }
+
+    .qc-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(230, 57, 70, 0.15);
+      border: 1px solid rgba(230, 57, 70, 0.4);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #ff6b6b;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      box-shadow: 0 0 15px rgba(230, 57, 70, 0.2);
+    }
+
+    .live-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #e63946;
+      box-shadow: 0 0 10px #e63946;
+      animation: pulseDot 1.5s infinite;
+    }
+
+    @keyframes pulseDot {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.8; }
+    }
+
+    .btn-fullscreen {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-fullscreen:hover {
+      background: rgba(255, 255, 255, 0.16);
+      transform: translateY(-1px);
+    }
+
+    /* ─── Metric Stat Ribbon ────────────────────────────────────── */
+    .qc-metrics-ribbon {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .metric-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: rgba(255,255,255,0.2);
+    }
+
+    .metric-card.accent-blue::before { background: var(--paslon2-primary); }
+    .metric-card.accent-red::before { background: var(--paslon1-primary); }
+    .metric-card.accent-gold::before { background: var(--gold-leader); }
+    .metric-card.accent-emerald::before { background: var(--paslon3-primary); }
+
+    .metric-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 4px;
+    }
+
+    .metric-value-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .metric-value {
+      font-size: 32px;
+      font-weight: 800;
+      font-feature-settings: "tnum";
+      line-height: 1.1;
+      color: #ffffff;
+    }
+
+    .metric-sub {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .metric-progress {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .metric-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--paslon2-primary), #48cae4);
+      border-radius: 6px;
+      transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* ─── Main Section: Bar Chart & Cards ───────────────────────── */
+    .qc-main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      flex: 1;
+    }
+
+    /* ─── Podium / Vertical Bar Chart Showcase ──────────────────── */
+    .qc-chart-section {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 28px 24px 20px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .chart-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-color {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+    }
+
+    /* Podium Container */
+    .podium-stage {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 40px;
+      min-height: 380px;
+      padding: 20px 20px 0;
+      position: relative;
+    }
+
+    @media (max-width: 680px) {
+      .podium-stage {
+        gap: 20px;
+        min-height: 320px;
+        padding: 10px 0 0;
+      }
+    }
+
+    .podium-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      max-width: 280px;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    /* Trophy / Leader Floating Badge */
+    .leader-crown {
+      position: absolute;
+      top: -38px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffb703, #fb8500);
+      color: #001827;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 18px rgba(255, 183, 3, 0.6), 0 4px 12px rgba(0,0,0,0.4);
+      border: 2px solid #fff3bf;
+      animation: crownFloat 2s ease-in-out infinite;
+      z-index: 5;
+    }
+
+    .podium-col.is-leader .leader-crown {
+      display: inline-flex;
+    }
+
+    @keyframes crownFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    /* Top Avatar and Info */
+    .podium-head {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .podium-avatar-wrap {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      padding: 3px;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      background: rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .podium-col.paslon-1 .podium-avatar-wrap {
+      border: 3px solid var(--paslon1-primary);
+      box-shadow: 0 0 20px var(--paslon1-glow);
+    }
+
+    .podium-col.paslon-2 .podium-avatar-wrap {
+      border: 3px solid var(--paslon2-primary);
+      box-shadow: 0 0 20px var(--paslon2-glow);
+    }
+
+    .podium-col.is-leader .podium-avatar-wrap {
+      border-color: var(--gold-leader);
+      box-shadow: 0 0 25px var(--gold-glow);
+    }
+
+    .podium-avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #002235;
+      display: block;
+    }
+
+    .podium-pct {
+      font-family: var(--font-display);
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .podium-col.paslon-1 .podium-pct { color: #ff8fa3; }
+    .podium-col.paslon-2 .podium-pct { color: #90e0ef; }
+    .podium-col.is-leader .podium-pct { color: #ffd166; }
+
+    .podium-vote-pill {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.9);
+      letter-spacing: 0.02em;
+    }
+
+    /* Vertical Bar Column */
+    .podium-track {
+      width: 100%;
+      height: 220px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px 16px 6px 6px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .podium-bar {
+      width: 100%;
+      min-height: 14px;
+      height: 10%;
+      border-radius: 12px 12px 4px 4px;
+      position: relative;
+      transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.3);
+    }
+
+    .podium-col.paslon-1 .podium-bar {
+      background: linear-gradient(180deg, #ff4d6d 0%, #c1121f 50%, #780000 100%);
+      box-shadow: 0 0 20px rgba(230, 57, 70, 0.3);
+    }
+
+    .podium-col.paslon-2 .podium-bar {
+      background: linear-gradient(180deg, #48cae4 0%, #0096c7 50%, #023e8a 100%);
+      box-shadow: 0 0 20px rgba(0, 180, 216, 0.3);
+    }
+
+    .podium-col.is-leader .podium-bar {
+      border: 1px solid rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 30px rgba(255, 183, 3, 0.4);
+    }
+
+    /* Glowing highlight beam at the top of the bar */
+    .podium-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 0 10px #ffffff;
+    }
+
+    .podium-base {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      margin-top: 8px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    .podium-paslon-num {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 2px;
+    }
+
+    .podium-paslon-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.25;
+    }
+
+    .podium-paslon-vice {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+      line-height: 1.2;
+    }
+
+    /* ─── Grid: Candidate Spotlight Cards (Foto & Detail) ──────── */
+    .qc-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 24px;
+    }
+
+    .candidate-spotlight-card {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      overflow: hidden;
+    }
+
+    .candidate-spotlight-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .candidate-spotlight-card.is-leader {
+      border-color: rgba(255, 183, 3, 0.45);
+      box-shadow: 0 0 35px rgba(255, 183, 3, 0.15), 0 8px 30px rgba(0,0,0,0.3);
+    }
+
+    /* Leader Ribbon */
+    .leader-ribbon {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: linear-gradient(135deg, #ffb703, #fb8500);
+      color: #000000;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 5px 12px;
+      border-radius: 20px;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 4px 15px rgba(251, 133, 0, 0.4);
+      z-index: 2;
+    }
+
+    .candidate-spotlight-card.is-leader .leader-ribbon {
+      display: inline-flex;
+    }
+
+    .card-top-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* Candidate Photo 1:1 Square */
+    .card-photo-box {
+      width: 130px;
+      height: 130px;
+      min-width: 130px;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      background: #001f33;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+    }
+
+    .card-photo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .candidate-spotlight-card:hover .card-photo-img {
+      transform: scale(1.04);
+    }
+
+    .card-info-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .paslon-tag {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 6px;
+    }
+
+    .leader-names-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .leader-row {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .leader-role {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.45);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .leader-fullname {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Vote Score Row */
+    .card-stats-row {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stat-vote-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-vote-lbl {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-vote-num {
+      font-family: var(--font-display);
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1;
+      color: #ffffff;
+      font-feature-settings: "tnum";
+      transition: transform 0.2s ease, color 0.3s ease;
+    }
+
+    .stat-vote-num.pulse-change {
+      color: #ffd166;
+      transform: scale(1.1);
+    }
+
+    .stat-pct-group {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .stat-pct-badge {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--paslon2-primary);
+      font-feature-settings: "tnum";
+      line-height: 1.1;
+    }
+
+    .candidate-spotlight-card.paslon-1 .stat-pct-badge { color: #ff8fa3; }
+    .candidate-spotlight-card.paslon-2 .stat-pct-badge { color: #90e0ef; }
+    .candidate-spotlight-card.is-leader .stat-pct-badge { color: #ffd166; }
+
+    .stat-pct-sub {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Card Progress Bar */
+    .card-bar-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card-bar-fill {
+      height: 100%;
+      border-radius: 8px;
+      width: 0%;
+      transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .candidate-spotlight-card.paslon-1 .card-bar-fill {
+      background: linear-gradient(90deg, #ff4d6d, #c1121f);
+    }
+
+    .candidate-spotlight-card.paslon-2 .card-bar-fill {
+      background: linear-gradient(90deg, #48cae4, #0077b6);
+    }
+
+    .candidate-spotlight-card.is-leader .card-bar-fill {
+      box-shadow: 0 0 12px rgba(255, 183, 3, 0.5);
+    }
+
+    /* ─── Footer ─────────────────────────────────────────────────── */
+    .qc-footer {
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .qc-footer-sync {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ─── Error Notification ────────────────────────────────────── */
+    .qc-alert-banner {
+      background: rgba(120, 0, 0, 0.7);
+      border: 1px solid rgba(230, 57, 70, 0.6);
+      color: #ffcccc;
+      padding: 12px 18px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      backdrop-filter: blur(8px);
+    }
+
+    .qc-alert-banner.hidden {
+      display: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .qc-container { padding: 20px 16px; }
+      .qc-title-group h1 { font-size: 22px; }
+      .podium-stage { gap: 16px; }
+      .podium-pct { font-size: 28px; }
+      .card-top-row { gap: 14px; }
+      .card-photo-box { width: 100px; height: 100px; min-width: 100px; }
+      .stat-vote-num { font-size: 34px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Ambient background lighting -->
+  <div class="ambient-glow-1" aria-hidden="true"></div>
+  <div class="ambient-glow-2" aria-hidden="true"></div>
+
+  <div class="qc-container" id="qc-app">
+
+    <!-- Error Banner -->
+    <div class="qc-alert-banner hidden" id="qc-error-banner" role="alert">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span>Koneksi terputus ke server database. Sistem otomatis mencoba menghubungkan kembali...</span>
+    </div>
+
+    <!-- Top Header Bar -->
+    <header class="qc-top-bar">
+      <div class="qc-brand">
+        <div class="qc-emblem" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="qc-title-group">
+          <h1>QUICK COUNT REAL-TIME</h1>
+          <p>Pemilihan Ketua & Wakil Ketua OSIS SMPN 13 Penajam Paser Utara</p>
+        </div>
+      </div>
+
+      <div class="qc-controls">
+        <div class="live-badge" title="Data diperbarui secara live tiap 3 detik">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span>LIVE HITUNG CEPAT</span>
+        </div>
+        <button type="button" class="btn-fullscreen" id="btn-fullscreen" aria-label="Toggle Layar Penuh">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          <span id="fullscreen-text">Layar Penuh</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Metrics Stat Ribbon -->
+    <section class="qc-metrics-ribbon" aria-label="Statistik Suara Masuk">
+      <!-- Total Suara Masuk -->
+      <div class="metric-card accent-blue">
+        <span class="metric-label">Total Suara Masuk</span>
+        <div class="metric-value-row">
+          <span class="metric-value" id="val-total-votes">0</span>
+          <span class="metric-sub">Surat Suara</span>
+        </div>
+        <div class="metric-progress">
+          <div class="metric-progress-fill" id="fill-partisipasi-bar" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- DPT Total Pemilih -->
+      <div class="metric-card accent-emerald">
+        <span class="metric-label">Total Pemilih (DPT)</span>
+        <div class="metric-value-row">
+          <span class="metric-value" id="val-total-voters">0</span>
+          <span class="metric-sub">Siswa Terdaftar</span>
+        </div>
+        <div class="metric-progress">
+          <div class="metric-progress-fill" style="width: 100%; background: #2a9d8f;"></div>
+        </div>
+      </div>
+
+      <!-- Tingkat Partisipasi -->
+      <div class="metric-card accent-gold">
+        <span class="metric-label">Tingkat Partisipasi</span>
+        <div class="metric-value-row">
+          <span class="metric-value" id="val-partisipasi-pct">0.0%</span>
+          <span class="metric-sub">Kehadiran</span>
+        </div>
+        <div class="metric-progress">
+          <div class="metric-progress-fill" id="fill-partisipasi-gold" style="width: 0%; background: #ffb703;"></div>
+        </div>
+      </div>
+
+      <!-- Status Pemimpin -->
+      <div class="metric-card accent-red">
+        <span class="metric-label">Perolehan Tertinggi</span>
+        <div class="metric-value-row">
+          <span class="metric-value" style="font-size: 22px; margin-top: 4px;" id="val-leader-name">—</span>
+        </div>
+        <span class="metric-sub" id="val-leader-margin" style="margin-top: 6px;">Menunggu data...</span>
+      </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="qc-main-content">
+
+      <!-- 1. DIAGRAM BATANG (PODIUM BAR CHART) -->
+      <section class="qc-chart-section" aria-label="Diagram Batang Hasil Suara">
+        <div class="chart-header">
+          <h2 class="chart-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Diagram Batang Perolehan Suara
+          </h2>
+          <div class="chart-legend" id="chart-legend">
+            <!-- Diisi JS -->
+          </div>
+        </div>
+
+        <!-- The Interactive Vertical Bar Podium -->
+        <div class="podium-stage" id="podium-stage">
+          <p style="color: rgba(255,255,255,0.4); font-size: 14px; margin: auto;">Memuat visualisasi diagram batang...</p>
+        </div>
+      </section>
+
+      <!-- 2. KARTU SPOTLIGHT FOTO & DETAIL PASLON -->
+      <section aria-label="Rincian Suara Per Pasangan Calon">
+        <div class="qc-cards-grid" id="qc-cards-grid">
+          <!-- Diisi JS -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="qc-footer">
+      <div>
+        <span>Pemilihan Ketua & Wakil Ketua OSIS &bull; SMPN 13 Penajam Paser Utara</span>
+      </div>
+      <div class="qc-footer-sync">
+        <span id="qc-last-sync">Memperbarui...</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    'use strict';
+
+    // ─── Supabase Client Init ──────────────────────────────────────────────
+    let sbClient = null;
+    try {
+      if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+        sbClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      }
+    } catch(err) {
+      console.warn('Supabase init notice:', err);
+    }
+
+    const $ = id => document.getElementById(id);
+
+    // ─── Admin Authentication Persistence ──────────────────────────────────
+    let adminToken = localStorage.getItem('osis_admin_token') || sessionStorage.getItem('osis_admin_token') || null;
+
+    function isValidUUID(str) {
+      return typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+    }
+
+    async function ensureAuth(force = false) {
+      if (!force && isValidUUID(adminToken)) return true;
+      try {
+        const res = await rpc('admin_login', { p_password: 'guru13' });
+        if (res && res.ok && res.data?.token) {
+          adminToken = res.data.token;
+          localStorage.setItem('osis_admin_token', adminToken);
+          sessionStorage.setItem('osis_admin_token', adminToken);
+          return true;
+        }
+      } catch (e) {
+        console.warn('Auto auth error:', e);
+      }
+      return false;
+    }
+
+    async function rpc(fn, params = {}) {
+      if (!sbClient) {
+        if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+          try {
+            sbClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+          } catch(e) {}
+        }
+      }
+      if (sbClient) {
+        try {
+          const { data, error } = await sbClient.rpc(fn, params);
+          if (!error && data !== undefined && data !== null) {
+            return data;
+          }
+        } catch(err) {
+          console.warn(`client.rpc('${fn}') exception:`, err);
+        }
+      }
+
+      // Fallback REST fetch native
+      if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+        try {
+          const res = await fetch(`${window.SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+            method: 'POST',
+            headers: {
+              'apikey': window.SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(params || {})
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            return { ok: false, error: errData?.message || errData?.error || `HTTP ${res.status}` };
+          }
+
+          const data = await res.json();
+          return data;
+        } catch(fetchErr) {
+          console.error(`REST fetch('${fn}') error:`, fetchErr);
+          return { ok: false, error: fetchErr.message || 'Koneksi ke server gagal.' };
+        }
+      }
+
+      return { ok: false, error: 'Database belum terhubung.' };
+    }
+
+    function escHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ─── Fallback SVG Avatar ───────────────────────────────────────────────
+    function getFallbackAvatar(paslonNum) {
+      return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><rect width="160" height="160" fill="%23002235"/><circle cx="80" cy="60" r="30" fill="%23669bbc" opacity="0.4"/><path d="M30 140 C30 105, 55 95, 80 95 C105 95, 130 105, 130 140 Z" fill="%23669bbc" opacity="0.4"/><text x="80" y="85" font-family="sans-serif" font-size="20" font-weight="bold" fill="%23ffffff" text-anchor="middle">PASLON ${paslonNum}</text></svg>`;
+    }
+
+    // ─── Smooth Rolling Number Animation ───────────────────────────────────
+    const activeCounters = {};
+    function animateNumber(element, targetVal, duration = 800, suffix = '') {
+      if (!element) return;
+      const elId = element.id || Math.random().toString();
+      const currentText = element.textContent.replace(/[^0-9.]/g, '');
+      const startVal = parseFloat(currentText) || 0;
+      targetVal = parseFloat(targetVal) || 0;
+
+      if (startVal === targetVal) {
+        element.textContent = targetVal + suffix;
+        return;
+      }
+
+      if (activeCounters[elId]) {
+        cancelAnimationFrame(activeCounters[elId]);
+      }
+
+      const startTime = performance.now();
+      function update(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // Ease-out cubic
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const current = startVal + (targetVal - startVal) * ease;
+
+        if (suffix.includes('%')) {
+          element.textContent = current.toFixed(1) + suffix;
+        } else {
+          element.textContent = Math.round(current) + suffix;
+        }
+
+        if (progress < 1) {
+          activeCounters[elId] = requestAnimationFrame(update);
+        } else {
+          delete activeCounters[elId];
+          element.textContent = (suffix.includes('%') ? targetVal.toFixed(1) : targetVal) + suffix;
+        }
+      }
+      activeCounters[elId] = requestAnimationFrame(update);
+    }
+
+    // ─── Global State & Metadata Cache ─────────────────────────────────────
+    let candidateMeta = {}; // id -> { photo_url, chairman, vice_chairman, name, number }
+    let prevVotes = {};
+    let isMetaLoaded = false;
+    let failCount = 0;
+    let pollInterval = null;
+
+    // Load candidate profiles (photos, names) from public get_candidates RPC
+    async function loadCandidateProfiles() {
+      try {
+        const res = await rpc('get_candidates');
+        if (res && res.ok && Array.isArray(res.data)) {
+          res.data.forEach(c => {
+            const num = c.number || 1;
+            const chairman = c.chairman || (c.name ? c.name.split('&')[0].trim() : `Calon Ketua`);
+            const vice = c.vice_chairman || (c.name && c.name.includes('&') ? c.name.split('&')[1].trim() : 'Calon Wakil');
+            candidateMeta[c.id] = {
+              id: c.id,
+              number: num,
+              name: c.name || `Paslon ${num}`,
+              chairman: chairman,
+              vice_chairman: vice,
+              photo_url: c.photo_url || getFallbackAvatar(num)
+            };
+          });
+          isMetaLoaded = true;
+        }
+      } catch (err) {
+        console.warn('Candidate metadata load notice:', err);
+      }
+    }
+
+    // ─── Unified Render Function ───────────────────────────────────────────
+    function renderQuickCount(data) {
+      const candidates = data.candidates || [];
+      const totalVotes = data.total_votes || 0;
+      const totalVoters = data.total_voters || 0;
+      const turnoutPct = totalVoters > 0 ? (totalVotes / totalVoters) * 100 : 0;
+
+      // 1. Update Metrics Ribbon
+      animateNumber($('val-total-votes'), totalVotes);
+      animateNumber($('val-total-voters'), totalVoters);
+      animateNumber($('val-partisipasi-pct'), turnoutPct, 800, '%');
+      $('fill-partisipasi-bar').style.width = Math.min(turnoutPct, 100) + '%';
+      $('fill-partisipasi-gold').style.width = Math.min(turnoutPct, 100) + '%';
+
+      // Find leader
+      let maxVotes = 0;
+      let leaderCand = null;
+      let isTie = false;
+
+      candidates.forEach(c => {
+        const v = c.vote_count || 0;
+        if (v > maxVotes) {
+          maxVotes = v;
+          leaderCand = c;
+          isTie = false;
+        } else if (v > 0 && v === maxVotes) {
+          isTie = true;
+        }
+      });
+
+      if (totalVotes === 0) {
+        $('val-leader-name').textContent = 'Belum Ada Suara';
+        $('val-leader-margin').textContent = 'Menunggu pemilih pertama';
+      } else if (isTie) {
+        $('val-leader-name').textContent = 'Perolehan Seri';
+        $('val-leader-margin').textContent = `Masing-masing ${maxVotes} suara`;
+      } else if (leaderCand) {
+        const meta = candidateMeta[leaderCand.id] || {};
+        const leaderName = meta.chairman || leaderCand.name || `Paslon ${leaderCand.number}`;
+        const pct = ((maxVotes / totalVotes) * 100).toFixed(1);
+        $('val-leader-name').textContent = `Paslon 0${leaderCand.number}`;
+        $('val-leader-margin').textContent = `Memimpin dengan ${pct}% (${maxVotes} suara)`;
+      }
+
+      // 2. Render Vertical Bar Podium Chart
+      renderPodium(candidates, totalVotes, maxVotes, isTie);
+
+      // 3. Render Candidate Spotlight Cards
+      renderCards(candidates, totalVotes, maxVotes, isTie);
+
+      // Timestamp
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      $('qc-last-sync').innerHTML = `Sinkronisasi terakhir: <strong>${timeStr} WITA</strong> &bull; Siklus 3 dtk`;
+    }
+
+    // ─── Render Podium (Diagram Batang) ───────────────────────────────────
+    function renderPodium(candidates, totalVotes, maxVotes, isTie) {
+      const stage = $('podium-stage');
+      const legend = $('chart-legend');
+
+      // Sort by number for stable podium placement (Paslon 1 on left, Paslon 2 on right, etc.)
+      const sorted = [...candidates].sort((a, b) => (a.number || 0) - (b.number || 0));
+
+      if (stage.children.length !== sorted.length || stage.querySelector('p')) {
+        stage.innerHTML = '';
+        legend.innerHTML = '';
+
+        sorted.forEach((c, idx) => {
+          const num = c.number || (idx + 1);
+          const meta = candidateMeta[c.id] || {};
+          const photo = meta.photo_url || c.photo_url || getFallbackAvatar(num);
+          const chairman = meta.chairman || c.chairman || (c.name ? c.name.split('&')[0].trim() : `Calon Ketua`);
+          const vice = meta.vice_chairman || c.vice_chairman || (c.name && c.name.includes('&') ? c.name.split('&')[1].trim() : '');
+          const colClass = `paslon-${num}`;
+
+          // Create column
+          const col = document.createElement('div');
+          col.className = `podium-col ${colClass}`;
+          col.id = `podium-col-${c.id}`;
+          col.innerHTML = `
+            <div class="leader-crown" title="Suara Terbanyak" aria-label="Suara Terbanyak">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                <path d="M4 22h16"/>
+                <path d="M10 14.66V17c0 .55-.45 1-1 1H8v2h8v-2h-1c-.55 0-1-.45-1-1v-2.34"/>
+                <path d="M18 4H6v7a6 6 0 0 0 12 0V4z"/>
+              </svg>
+            </div>
+            <div class="podium-head">
+              <div class="podium-avatar-wrap">
+                <img class="podium-avatar" src="${escHtml(photo)}" alt="Paslon ${num}" id="podium-avatar-${c.id}" />
+              </div>
+              <div class="podium-pct" id="podium-pct-${c.id}">0.0%</div>
+              <div class="podium-vote-pill" id="podium-votes-${c.id}">0 Suara</div>
+            </div>
+            <div class="podium-track">
+              <div class="podium-bar" id="podium-bar-${c.id}" style="height: 10%"></div>
+            </div>
+            <div class="podium-base" title="${escHtml(chairman + (vice ? ' & ' + vice : ''))}">
+              <div class="podium-paslon-num">PASLON ${String(num).padStart(2, '0')}</div>
+              <div class="podium-paslon-name" id="podium-name-${c.id}">${escHtml(chairman)}</div>
+              <div class="podium-paslon-vice" id="podium-vice-${c.id}">${escHtml(vice ? `& ${vice}` : '')}</div>
+            </div>
+          `;
+          stage.appendChild(col);
+
+          // Legend item
+          const legItem = document.createElement('div');
+          legItem.className = 'legend-item';
+          const dotColor = num === 1 ? 'var(--paslon1-primary)' : 'var(--paslon2-primary)';
+          legItem.innerHTML = `<span class="legend-color" style="background:${dotColor}"></span><span>Paslon 0${num}: ${escHtml(chairman)}${vice ? ` & ${escHtml(vice)}` : ''}</span>`;
+          legend.appendChild(legItem);
+        });
+      }
+
+      // Update values and bar heights
+      sorted.forEach((c, idx) => {
+        const num = c.number || (idx + 1);
+        const meta = candidateMeta[c.id] || {};
+        const votes = c.vote_count || 0;
+        const pct = totalVotes > 0 ? (votes / totalVotes) * 100 : 0;
+        const isLeader = !isTie && maxVotes > 0 && votes === maxVotes;
+
+        const col = $(`podium-col-${c.id}`);
+        const pctEl = $(`podium-pct-${c.id}`);
+        const votesEl = $(`podium-votes-${c.id}`);
+        const barEl = $(`podium-bar-${c.id}`);
+        const nameEl = $(`podium-name-${c.id}`);
+        const viceEl = $(`podium-vice-${c.id}`);
+        const avatarEl = $(`podium-avatar-${c.id}`);
+
+        if (!col || !barEl) return;
+
+        // Update photo if cached became available
+        if (avatarEl && meta.photo_url && avatarEl.src !== meta.photo_url) {
+          avatarEl.src = meta.photo_url;
+        }
+        const chairman = meta.chairman || c.chairman || (c.name ? c.name.split('&')[0].trim() : '');
+        const vice = meta.vice_chairman || c.vice_chairman || (c.name && c.name.includes('&') ? c.name.split('&')[1].trim() : '');
+        if (nameEl && chairman) {
+          nameEl.textContent = chairman;
+        }
+        if (viceEl && vice) {
+          viceEl.textContent = `& ${vice}`;
+        }
+
+        // Leader state toggle
+        col.classList.toggle('is-leader', isLeader);
+
+        // Animated percentage and votes
+        animateNumber(pctEl, pct, 800, '%');
+        votesEl.textContent = `${votes} Suara`;
+
+        // Calculate bar height: scaled so bars always visually fill the 220px track nicely
+        // Height formula: minimum 12% so even 0 votes has a visible base cap, max 95%
+        let barHeight = 12;
+        if (totalVotes > 0) {
+          barHeight = 12 + (pct * 0.83); // 100% -> 95% height
+        }
+        barEl.style.height = barHeight + '%';
+      });
+    }
+
+    // ─── Render Candidate Spotlight Cards ─────────────────────────────────
+    function renderCards(candidates, totalVotes, maxVotes, isTie) {
+      const grid = $('qc-cards-grid');
+      const sorted = [...candidates].sort((a, b) => (a.number || 0) - (b.number || 0));
+
+      if (grid.children.length !== sorted.length) {
+        grid.innerHTML = '';
+        sorted.forEach((c, idx) => {
+          const num = c.number || (idx + 1);
+          const meta = candidateMeta[c.id] || {};
+          const photo = meta.photo_url || c.photo_url || getFallbackAvatar(num);
+          const chairman = meta.chairman || (c.name ? c.name.split('&')[0].trim() : `Calon Ketua`);
+          const vice = meta.vice_chairman || (c.name && c.name.includes('&') ? c.name.split('&')[1].trim() : 'Calon Wakil');
+
+          const card = document.createElement('div');
+          card.className = `candidate-spotlight-card paslon-${num}`;
+          card.id = `cand-card-${c.id}`;
+          card.innerHTML = `
+            <div class="leader-ribbon">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <span>Unggul Sementara</span>
+            </div>
+            <div class="card-top-row">
+              <div class="card-photo-box">
+                <img class="card-photo-img" id="card-img-${c.id}" src="${escHtml(photo)}" alt="Foto Paslon ${num}" />
+              </div>
+              <div class="card-info-col">
+                <span class="paslon-tag">PASLON 0${num}</span>
+                <div class="leader-names-box">
+                  <div class="leader-row">
+                    <span class="leader-role">Ketua</span>
+                    <span class="leader-fullname" id="card-chairman-${c.id}" title="${escHtml(chairman)}">${escHtml(chairman)}</span>
+                  </div>
+                  <div class="leader-row" style="margin-top: 6px;">
+                    <span class="leader-role">Wakil Ketua</span>
+                    <span class="leader-fullname" id="card-vice-${c.id}" title="${escHtml(vice)}">${escHtml(vice)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-stats-row">
+              <div class="stat-vote-group">
+                <span class="stat-vote-lbl">Perolehan Suara</span>
+                <span class="stat-vote-num" id="card-votes-${c.id}">0</span>
+              </div>
+              <div class="stat-pct-group">
+                <span class="stat-pct-badge" id="card-pct-${c.id}">0.0%</span>
+                <span class="stat-pct-sub" id="card-share-${c.id}">0 dari 0 suara</span>
+              </div>
+            </div>
+
+            <div class="card-bar-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+              <div class="card-bar-fill" id="card-fill-${c.id}" style="width: 0%"></div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }
+
+      // Update card values
+      sorted.forEach(c => {
+        const meta = candidateMeta[c.id] || {};
+        const votes = c.vote_count || 0;
+        const pct = totalVotes > 0 ? (votes / totalVotes) * 100 : 0;
+        const isLeader = !isTie && maxVotes > 0 && votes === maxVotes;
+
+        const card = $(`cand-card-${c.id}`);
+        const votesEl = $(`card-votes-${c.id}`);
+        const pctEl = $(`card-pct-${c.id}`);
+        const fillEl = $(`card-fill-${c.id}`);
+        const shareEl = $(`card-share-${c.id}`);
+        const imgEl = $(`card-img-${c.id}`);
+        const chairmanEl = $(`card-chairman-${c.id}`);
+        const viceEl = $(`card-vice-${c.id}`);
+
+        if (!card || !votesEl) return;
+
+        // Sync metadata
+        if (imgEl && meta.photo_url && imgEl.src !== meta.photo_url) {
+          imgEl.src = meta.photo_url;
+        }
+        if (chairmanEl && meta.chairman) chairmanEl.textContent = meta.chairman;
+        if (viceEl && meta.vice_chairman) viceEl.textContent = meta.vice_chairman;
+
+        // Leader highlight
+        card.classList.toggle('is-leader', isLeader);
+
+        // Flash animation if votes changed
+        if (prevVotes[c.id] !== undefined && prevVotes[c.id] !== votes) {
+          votesEl.classList.add('pulse-change');
+          setTimeout(() => votesEl.classList.remove('pulse-change'), 600);
+        }
+
+        // Animate count and percentage
+        animateNumber(votesEl, votes);
+        animateNumber(pctEl, pct, 800, '%');
+        fillEl.style.width = pct.toFixed(1) + '%';
+        shareEl.textContent = `${votes} dari ${totalVotes} suara`;
+
+        prevVotes[c.id] = votes;
+      });
+    }
+
+    // ─── Polling Loop ──────────────────────────────────────────────────────
+    async function poll() {
+      try {
+        // Load metadata once if not yet loaded
+        if (!isMetaLoaded) {
+          await loadCandidateProfiles();
+        }
+
+        if (!isValidUUID(adminToken)) {
+          const ok = await ensureAuth(true);
+          if (!ok) {
+            failCount++;
+            if (failCount >= 3) $('qc-error-banner').classList.remove('hidden');
+            return;
+          }
+        }
+
+        let result = await rpc('admin_quick_count', { p_token: adminToken });
+
+        // Auto-renew token if expired or rejected
+        if (!result || !result.ok) {
+          console.warn('Quick count rejected, renewing token...', result?.error);
+          const ok = await ensureAuth(true);
+          if (ok) {
+            result = await rpc('admin_quick_count', { p_token: adminToken });
+          }
+        }
+
+        if (!result || !result.ok) {
+          failCount++;
+          if (failCount >= 3) $('qc-error-banner').classList.remove('hidden');
+          return;
+        }
+
+        failCount = 0;
+        $('qc-error-banner').classList.add('hidden');
+        renderQuickCount(result.data);
+
+      } catch (err) {
+        console.error('Quick count poll error:', err);
+        failCount++;
+        if (failCount >= 3) $('qc-error-banner').classList.remove('hidden');
+      }
+    }
+
+    // ─── Fullscreen Toggle Handler ─────────────────────────────────────────
+    const fsBtn = $('btn-fullscreen');
+    const fsText = $('fullscreen-text');
+
+    if (fsBtn) {
+      fsBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(err => {
+            console.warn('Error attempting to enable fullscreen:', err);
+          });
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          }
+        }
+      });
+
+      document.addEventListener('fullscreenchange', () => {
+        if (document.fullscreenElement) {
+          fsText.textContent = 'Keluar Layar Penuh';
+        } else {
+          fsText.textContent = 'Layar Penuh';
+        }
+      });
+    }
+
+    // ─── Initialization ────────────────────────────────────────────────────
+    (async () => {
+      await ensureAuth(true);
+      await loadCandidateProfiles();
+      await poll();
+      pollInterval = setInterval(poll, 3000);
+    })();
+  </script>
+</body>
+</html>

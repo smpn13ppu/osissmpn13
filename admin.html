@@ -1,0 +1,3400 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Admin — Pemilihan OSIS SMPN 13 PPU</title>
+  <meta name="description" content="Panel administrasi pemilihan Ketua OSIS SMPN 13 Penajam Paser Utara." />
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    /* ── Layout Admin ── */
+    body { background: var(--color-papaya-whip); }
+
+    /* Login */
+    .login-page { display: none !important; }
+
+    /* App Shell */
+    .admin-shell { display: flex; flex-direction: column; min-height: 100vh; }
+    .admin-shell.active { display: flex; }
+
+    /* Topbar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      background: var(--color-deep-space);
+      color: #ffffff;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 32px;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+    .topbar-brand {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      padding: 16px 0;
+    }
+    .topbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .topbar-nav::-webkit-scrollbar { display: none; }
+
+    .nav-tab {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.65);
+      font-family: var(--font-body);
+      font-size: var(--text-small);
+      font-weight: 500;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: var(--radius-input);
+      white-space: nowrap;
+      transition: color var(--transition-micro), background var(--transition-micro);
+    }
+    .nav-tab:hover { color: #ffffff; background: rgba(255,255,255,0.08); }
+    .nav-tab.active { color: #ffffff; background: rgba(255,255,255,0.14); }
+    .nav-tab.tab-danger { color: rgba(253,240,213,0.70); }
+    .nav-tab.tab-danger:hover { color: #fdf0d5; background: rgba(120,0,0,0.40); }
+
+    /* Content */
+    .admin-content { flex: 1; padding: 32px 32px; max-width: 1160px; margin: 0 auto; width: 100%; }
+
+    /* Panel Tab */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: card-in 300ms forwards; }
+
+    /* ── Tab Kontrol ── */
+    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .control-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; }
+    .election-toggle-card { display: flex; align-items: center; gap: 12px; }
+
+    /* ── Tab Paslon ── */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .candidate-row-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      margin-bottom: 12px;
+    }
+    .candidate-row-info { flex: 1; min-width: 0; }
+    .candidate-row-name { font-weight: 600; color: var(--color-deep-space); }
+    .candidate-row-sub { font-size: var(--text-small); color: rgba(0,48,73,0.60); }
+    .candidate-row-vision { font-size: var(--text-small); color: rgba(0,48,73,0.70); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px; }
+    .candidate-row-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    /* ── Tab Pemilih & Custom Uploader ── */
+    .import-card { margin-bottom: 24px; }
+    .upload-dropzone {
+      border: 2px dashed rgba(0, 48, 73, 0.25);
+      border-radius: var(--radius-card);
+      background: rgba(253, 240, 213, 0.35);
+      padding: 32px 24px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition: all var(--transition-micro);
+    }
+    .upload-dropzone:hover, .upload-dropzone.drag-over {
+      border-color: var(--color-steel-blue);
+      background: rgba(102, 155, 188, 0.12);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 48, 73, 0.06);
+    }
+    .upload-icon-circle {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      background: rgba(102, 155, 188, 0.20);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-deep-space);
+      transition: transform var(--transition-micro), background var(--transition-micro), color var(--transition-micro);
+    }
+    .upload-dropzone:hover .upload-icon-circle {
+      transform: scale(1.08);
+      background: var(--color-deep-space);
+      color: #ffffff;
+    }
+    .upload-title {
+      font-size: var(--text-body);
+      font-weight: 600;
+      color: var(--color-deep-space);
+      margin-bottom: 4px;
+    }
+    .upload-subtitle {
+      font-size: var(--text-small);
+      color: rgba(0, 48, 73, 0.65);
+      margin-bottom: 16px;
+    }
+    .format-pills {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .format-pill {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: rgba(0, 48, 73, 0.08);
+      color: var(--color-deep-space);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .format-pill.excel {
+      background: rgba(30, 107, 58, 0.14);
+      color: var(--color-success-text);
+      border: 1px solid rgba(30, 107, 58, 0.25);
+    }
+    .format-pill.csv {
+      background: rgba(102, 155, 188, 0.18);
+      color: var(--color-deep-space);
+      border: 1px solid rgba(102, 155, 188, 0.35);
+    }
+    .file-selected-card {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      background: #ffffff;
+      border: 1.5px solid var(--color-steel-blue);
+      border-radius: var(--radius-card);
+      margin-top: 16px;
+      box-shadow: 0 4px 14px rgba(0, 48, 73, 0.06);
+      animation: card-in 200ms ease;
+      flex-wrap: wrap;
+    }
+    .file-selected-card.active {
+      display: flex;
+    }
+    .file-meta-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      text-align: left;
+    }
+    .file-icon-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(30, 107, 58, 0.15);
+      color: #1e6b3a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .file-name-label {
+      font-weight: 600;
+      font-size: var(--text-small);
+      color: var(--color-deep-space);
+      word-break: break-all;
+    }
+    .file-detail-sub {
+      font-size: var(--text-micro);
+      color: rgba(0, 48, 73, 0.60);
+      margin-top: 2px;
+    }
+    .file-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .template-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 18px;
+      background: rgba(102, 155, 188, 0.12);
+      border-radius: var(--radius-input);
+      border-left: 4px solid var(--color-steel-blue);
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .template-desc {
+      font-size: var(--text-small);
+      color: var(--color-deep-space);
+    }
+    .template-desc code {
+      background: rgba(0, 48, 73, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .search-row { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+    .search-input-wrap { flex: 1; }
+
+    /* ── Tab Tautan ── */
+    .links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .link-card { text-decoration: none; color: inherit; transition: transform var(--transition-micro), border-color var(--transition-micro); }
+    .link-card:hover { transform: translateY(-2px); border-color: var(--color-steel-blue); }
+    .link-card-title { font-family: var(--font-display); font-size: var(--text-h3); font-weight: 700; margin-bottom: 8px; }
+    .link-card-desc { font-size: var(--text-small); color: rgba(0,48,73,0.65); }
+
+    /* ── Dialog Form Paslon ── */
+    .dialog-form { max-width: 520px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .col-span-2 { grid-column: span 2; }
+    textarea.input { resize: vertical; min-height: 70px; }
+
+    /* ── Foto Paslon Uploader & Kompresi ── */
+    .photo-uploader-box {
+      border: 1.5px dashed var(--color-border);
+      border-radius: var(--radius-input);
+      background: #faf8f5;
+      padding: 10px;
+      transition: border-color var(--transition-fast), background var(--transition-fast);
+    }
+    .photo-uploader-box.dragover {
+      border-color: var(--color-molten-lava);
+      background: rgba(120,0,0,0.05);
+    }
+    .photo-dropzone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 16px 12px;
+      cursor: pointer;
+      text-align: center;
+      color: var(--color-deep-blue);
+      border-radius: var(--radius-sm);
+      transition: background var(--transition-fast);
+    }
+    .photo-dropzone:hover {
+      background: rgba(0,48,73,0.04);
+    }
+    .photo-dropzone svg {
+      color: var(--color-molten-lava);
+      margin-bottom: 2px;
+    }
+    .photo-drop-text {
+      font-size: var(--text-small);
+      font-weight: 600;
+    }
+    .photo-drop-sub {
+      font-size: var(--text-micro);
+      color: rgba(0,48,73,0.60);
+    }
+    .photo-preview-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 4px;
+    }
+    .photo-preview-card.hidden {
+      display: none;
+    }
+    #photo-preview-img {
+      width: 74px;
+      height: 74px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--color-border);
+      background: #ffffff;
+      flex-shrink: 0;
+    }
+    .photo-preview-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+      min-width: 0;
+    }
+    .photo-preview-badge {
+      display: inline-block;
+      align-self: flex-start;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-deep-blue);
+      background: rgba(102,155,188,0.22);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .photo-preview-sub {
+      font-size: 11px;
+      color: rgba(0,48,73,0.65);
+    }
+    .photo-preview-btns {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    /* Bulk Action Bar */
+    .bulk-action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 16px;
+      background: rgba(193, 18, 31, 0.08);
+      border: 1px solid rgba(193, 18, 31, 0.25);
+      border-radius: var(--radius-input);
+      margin-bottom: 14px;
+      animation: card-in 200ms ease;
+      flex-wrap: wrap;
+    }
+    .bulk-action-bar.hidden {
+      display: none !important;
+    }
+    .bulk-action-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: var(--text-small);
+      color: var(--color-deep-space);
+      font-weight: 500;
+    }
+    .bulk-count-badge {
+      background: var(--color-brick-red);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+    .bulk-action-btns {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Sortable Columns */
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+      transition: background 150ms ease, color 150ms ease;
+      white-space: nowrap;
+    }
+    th.sortable:hover {
+      background: rgba(0, 48, 73, 0.06);
+      color: var(--color-brick-red);
+    }
+    .sort-icon {
+      display: inline-block;
+      margin-left: 4px;
+      font-size: 11px;
+      opacity: 0.45;
+      transition: opacity 150ms ease, transform 150ms ease;
+    }
+    th.sortable:hover .sort-icon {
+      opacity: 0.85;
+    }
+    th.sort-active {
+      color: var(--color-brick-red);
+      background: rgba(193, 18, 31, 0.05);
+    }
+    th.sort-active .sort-icon {
+      opacity: 1;
+      font-weight: bold;
+    }
+
+    /* Checkbox Styles in Table */
+    .th-checkbox, .td-checkbox {
+      width: 44px;
+      text-align: center;
+      padding: 10px 8px !important;
+    }
+    .voter-row-checkbox {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--color-brick-red);
+      vertical-align: middle;
+    }
+    #check-all-voters {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--color-brick-red);
+      vertical-align: middle;
+    }
+    tr.selected-row {
+      background-color: rgba(193, 18, 31, 0.06) !important;
+    }
+
+    @media (max-width: 768px) {
+      .topbar-inner { padding: 0 16px; }
+      .admin-content { padding: 20px 16px; }
+      .stat-row { grid-template-columns: 1fr; }
+      .control-row { grid-template-columns: 1fr; }
+      .links-grid { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .col-span-2 { grid-column: span 1; }
+    }
+
+    /* ── Tab Laporan & Cetak ── */
+    .export-options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .export-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: transform var(--transition-micro), border-color var(--transition-micro), box-shadow var(--transition-micro);
+    }
+    .export-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--color-steel-blue);
+      box-shadow: 0 4px 14px rgba(0,48,73,0.07);
+    }
+    .export-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .export-card-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .export-card-content h4 {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-deep-space);
+      margin-bottom: 6px;
+    }
+    .export-card-content p {
+      font-size: var(--text-micro);
+      color: rgba(0,48,73,0.68);
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+    .export-card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    /* Dokumen Berita Acara (Screen Preview) */
+    .berita-acara-paper {
+      background: #ffffff;
+      color: #111111;
+      max-width: 860px;
+      margin: 0 auto 40px auto;
+      padding: 48px 56px;
+      border-radius: 4px;
+      box-shadow: 0 8px 30px rgba(0,48,73,0.12), 0 1px 4px rgba(0,0,0,0.06);
+      border: 1px solid #e2dac9;
+      font-family: 'Times New Roman', Times, serif;
+      line-height: 1.45;
+      font-size: 13.5px;
+    }
+
+    /* Kop Surat */
+    .doc-kop {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding-bottom: 12px;
+      border-bottom: 3px double #111111;
+      margin-bottom: 22px;
+      text-align: center;
+    }
+    .doc-kop-logo {
+      width: 72px;
+      height: 72px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .doc-kop-logo svg {
+      width: 100%;
+      height: 100%;
+      color: #003049;
+    }
+    .doc-kop-text {
+      flex: 1;
+    }
+    .doc-kop-text h5 {
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin: 0;
+      text-transform: uppercase;
+      font-family: inherit;
+    }
+    .doc-kop-text h4 {
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin: 2px 0;
+      text-transform: uppercase;
+      font-family: inherit;
+    }
+    .doc-kop-text h3 {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      margin: 2px 0;
+      text-transform: uppercase;
+      font-family: inherit;
+    }
+    .doc-kop-text p {
+      font-size: 11px;
+      margin: 2px 0 0 0;
+      font-style: italic;
+    }
+
+    .doc-title-block {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+    .doc-title-block h2 {
+      font-size: 15.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin: 0 0 4px 0;
+      letter-spacing: 0.02em;
+      text-decoration: underline;
+      font-family: inherit;
+    }
+    .doc-title-block p {
+      font-size: 12px;
+      margin: 0;
+      color: #222222;
+      font-weight: 600;
+    }
+
+    .doc-narrative {
+      text-align: justify;
+      margin-bottom: 16px;
+      text-indent: 32px;
+    }
+
+    .doc-section-heading {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin: 18px 0 8px 0;
+      padding-bottom: 3px;
+      border-bottom: 1px solid #cccccc;
+      letter-spacing: 0.02em;
+    }
+
+    /* Tabel Resmi Dokumen */
+    .doc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 16px 0;
+      font-size: 12.5px;
+    }
+    .doc-table th, .doc-table td {
+      border: 1px solid #333333;
+      padding: 6px 10px;
+      vertical-align: middle;
+    }
+    .doc-table th {
+      background-color: #f2f2f2;
+      font-weight: 700;
+      text-align: center;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.02em;
+    }
+    .doc-table tr.highlight-winner {
+      background-color: #f9f6e8;
+      font-weight: 600;
+    }
+
+    /* Kotak Paslon Terpilih */
+    .doc-winner-box {
+      border: 2px solid #111111;
+      padding: 12px 18px;
+      background: #faf8f5;
+      margin: 16px 0;
+      text-align: center;
+      border-radius: 4px;
+    }
+    .doc-winner-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #333333;
+      margin-bottom: 4px;
+    }
+    .doc-winner-name {
+      font-size: 16px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #000000;
+      margin-bottom: 2px;
+    }
+    .doc-winner-sub {
+      font-size: 13px;
+      color: #333333;
+    }
+
+    /* Tanda Tangan */
+    .doc-signatures {
+      margin-top: 24px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .doc-sig-date {
+      text-align: right;
+      margin-bottom: 18px;
+      font-size: 13px;
+    }
+    .doc-sig-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .doc-sig-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .doc-sig-role {
+      font-size: 12px;
+      font-weight: 600;
+      min-height: 32px;
+    }
+    .doc-sig-space {
+      height: 65px;
+    }
+    .doc-sig-name {
+      font-size: 12.5px;
+      font-weight: 700;
+      border-bottom: 1px solid #111111;
+      display: inline-block;
+      padding-bottom: 2px;
+      min-width: 170px;
+    }
+    .doc-sig-nip {
+      font-size: 11px;
+      margin-top: 2px;
+    }
+    .doc-saksi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .export-options-grid { grid-template-columns: 1fr; }
+      .berita-acara-paper { padding: 24px 20px; }
+      .doc-saksi-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── PRINT MEDIA QUERY ── */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm 15mm 15mm 15mm;
+      }
+      body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        color: #000000 !important;
+        font-size: 11pt !important;
+      }
+      /* Sembunyikan elemen shell admin & tombol saat mencetak */
+      .topbar,
+      .toast-container,
+      .overlay,
+      .no-print,
+      .admin-content > .tab-panel:not(#tab-laporan),
+      #tab-laporan > *:not(#berita-acara-wrapper) {
+        display: none !important;
+      }
+      .admin-shell, .admin-content, #tab-laporan, #berita-acara-wrapper {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+      }
+      .berita-acara-paper {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      .doc-table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+      }
+      .doc-table th, .doc-table td {
+        border: 1px solid #000000 !important;
+        color: #000000 !important;
+      }
+      .page-break-avoid {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== ADMIN SHELL (LANGSUNG AKTIF) ===== -->
+  <div class="admin-shell active" id="admin-shell">
+
+    <!-- Topbar -->
+    <nav class="topbar" aria-label="Navigasi panel admin">
+      <div class="topbar-inner">
+        <span class="topbar-brand">Panel Admin — Pemilihan OSIS SMPN 13 PPU</span>
+        <div class="topbar-nav" role="tablist" aria-label="Tab navigasi">
+          <button class="nav-tab active" role="tab" data-tab="kontrol" aria-selected="true" id="tab-btn-kontrol">Kontrol</button>
+          <button class="nav-tab" role="tab" data-tab="paslon" aria-selected="false" id="tab-btn-paslon">Paslon</button>
+          <button class="nav-tab" role="tab" data-tab="pemilih" aria-selected="false" id="tab-btn-pemilih">Pemilih</button>
+          <button class="nav-tab" role="tab" data-tab="laporan" aria-selected="false" id="tab-btn-laporan">Cetak &amp; Ekspor</button>
+          <button class="nav-tab" role="tab" data-tab="tautan" aria-selected="false" id="tab-btn-tautan">Tautan</button>
+          <a href="index.html" class="nav-tab tab-danger" id="btn-back-voting" style="text-decoration:none;">Ke Halaman Voting</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Konten -->
+    <main class="admin-content">
+
+      <!-- ── TAB KONTROL ── -->
+      <div class="tab-panel active" id="tab-kontrol" role="tabpanel" aria-labelledby="tab-btn-kontrol">
+        <h2 style="margin-bottom: 24px;">Kontrol Pemilihan</h2>
+
+        <!-- Stat Row -->
+        <div class="stat-row">
+          <div class="stat-card stagger-item">
+            <p class="stat-label">Status Pemilihan</p>
+            <p class="stat-value" id="stat-status">—</p>
+            <p class="stat-sub" id="stat-status-sub"></p>
+          </div>
+          <div class="stat-card stagger-item">
+            <p class="stat-label">Total Pemilih Terdaftar</p>
+            <p class="stat-value font-numeric" id="stat-total-voters">—</p>
+            <p class="stat-sub">siswa</p>
+          </div>
+          <div class="stat-card stagger-item">
+            <p class="stat-label">Sudah Memilih</p>
+            <p class="stat-value font-numeric" id="stat-voted">—</p>
+            <p class="stat-sub" id="stat-participation"></p>
+          </div>
+        </div>
+
+        <!-- Kontrol Tombol -->
+        <div class="card mb-6">
+          <h3 style="margin-bottom: 16px;">Status Pemilihan</h3>
+          <div class="election-toggle-card">
+            <button class="btn btn-primary" id="btn-buka" aria-label="Buka pemilihan" disabled>Buka Pemilihan</button>
+            <button class="btn btn-secondary" id="btn-tutup" aria-label="Tutup pemilihan" disabled>Tutup Pemilihan</button>
+          </div>
+        </div>
+
+        <!-- Cetak & Ekspor Cepat -->
+        <div class="card mb-6" style="background: linear-gradient(135deg, rgba(0,48,73,0.03) 0%, rgba(102,155,188,0.12) 100%); border-left: 4px solid var(--color-deep-space);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <h3 style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><path d="M6 14h12v8H6z"></path></svg>
+                Laporan &amp; Cetak Berita Acara
+              </h3>
+              <p class="text-small text-muted" style="margin: 0;">Cetak Berita Acara resmi hasil pemilihan OSIS atau unduh rekapitulasi suara dalam format Excel / CSV.</p>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="btn btn-secondary btn-sm" id="btn-quick-goto-laporan" type="button" style="display: inline-flex; align-items: center; gap: 6px;">
+                <span>Buka Panel Laporan &rarr;</span>
+              </button>
+              <button class="btn btn-primary btn-sm" id="btn-quick-print" type="button" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                <span>Cetak Berita Acara (PDF)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reset Suara -->
+        <div class="card">
+          <h3 style="margin-bottom: 8px;">Reset Suara</h3>
+          <p class="text-small text-muted mb-4">Menghapus semua data suara dan mereset status pemilih. Tindakan ini tidak dapat dibatalkan.</p>
+          <button class="btn btn-danger" id="btn-reset-votes" aria-label="Reset semua suara">Reset Semua Suara</button>
+        </div>
+      </div>
+
+      <!-- ── TAB PASLON ── -->
+      <div class="tab-panel" id="tab-paslon" role="tabpanel" aria-labelledby="tab-btn-paslon">
+        <div class="section-header">
+          <h2>Pasangan Calon</h2>
+          <button class="btn btn-primary" id="btn-add-candidate" aria-label="Tambah paslon baru">+ Tambah Paslon</button>
+        </div>
+        <div id="candidates-list" aria-label="Daftar pasangan calon">
+          <p class="text-muted text-small">Memuat...</p>
+        </div>
+      </div>
+
+      <!-- ── TAB PEMILIH ── -->
+      <div class="tab-panel" id="tab-pemilih" role="tabpanel" aria-labelledby="tab-btn-pemilih">
+        <h2 style="margin-bottom: 20px;">Data Pemilih (DPT)</h2>
+
+        <!-- Kotak Template & Ketentuan Format -->
+        <div class="template-box">
+          <div class="template-desc">
+            <strong>Format Kolom Berkas:</strong> <code>nisn</code>, <code>nama</code>, <code>kelas</code>, <code>jenis kelamin</code>, <code>agama</code>
+            <div style="font-size: var(--text-micro); color: rgba(0,48,73,0.70); margin-top: 3px;">
+              Mendukung berkas Microsoft Excel (.xlsx, .xls) dan CSV. Baris pertama berisi judul kolom.
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-download-template" style="display:inline-flex; align-items:center; gap:6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Unduh Format Contoh (.xlsx)
+          </button>
+        </div>
+
+        <!-- Import Card & Dropzone -->
+        <div class="card import-card">
+          <h3 style="margin-bottom: 12px;">Unggah Berkas Pemilih</h3>
+          
+          <input type="file" id="voter-file-input" accept=".xlsx, .xls, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv" style="display: none;" />
+
+          <div class="upload-dropzone" id="upload-dropzone" tabindex="0" role="button" aria-label="Area unggah berkas pemilih">
+            <div class="upload-icon-circle">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <p class="upload-title">Tarik &amp; Lepas Berkas Excel atau CSV di Sini</p>
+            <p class="upload-subtitle">atau klik tombol di bawah untuk memilih berkas dari perangkat Anda</p>
+            
+            <button type="button" class="btn btn-primary btn-sm" id="btn-browse-trigger" style="pointer-events: auto;">
+              Pilih Berkas Excel / CSV
+            </button>
+
+            <div class="format-pills">
+              <span class="format-pill excel">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
+                .XLSX
+              </span>
+              <span class="format-pill excel">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
+                .XLS
+              </span>
+              <span class="format-pill csv">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                .CSV
+              </span>
+            </div>
+          </div>
+
+          <!-- File Info Card (Setelah file dipilih) -->
+          <div class="file-selected-card" id="file-selected-card" style="flex-direction: column; align-items: stretch;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+              <div class="file-meta-group">
+                <div class="file-icon-avatar" id="file-icon-avatar">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="8" y1="13" x2="16" y2="13"></line>
+                    <line x1="8" y1="17" x2="16" y2="17"></line>
+                  </svg>
+                </div>
+                <div>
+                  <p class="file-name-label" id="file-name-label">daftar_siswa.xlsx</p>
+                  <p class="file-detail-sub" id="file-detail-sub">0 KB • 0 baris pemilih terdeteksi</p>
+                </div>
+              </div>
+              <div class="file-actions">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-file">Batal</button>
+                <button type="button" class="btn btn-primary btn-sm" id="btn-do-import">Mulai Impor Data</button>
+              </div>
+            </div>
+
+            <!-- Tabel Pratinjau 3 Baris Pertama -->
+            <div class="file-preview-wrap" id="file-preview-wrap" style="margin-top: 14px; width: 100%; overflow-x: auto; display: none;">
+              <p style="font-size: 11.5px; font-weight: 600; color: var(--color-deep-space); margin-bottom: 6px;">Pratinjau Data yang Terbaca (3 Baris Pertama):</p>
+              <table style="width: 100%; font-size: 12px; background: rgba(253, 240, 213, 0.5); border-radius: 6px; border-collapse: collapse; border: 1px solid var(--color-border);">
+                <thead>
+                  <tr style="background: rgba(0, 48, 73, 0.08); text-align: left; color: var(--color-deep-space);">
+                    <th style="padding: 6px 10px; font-weight: 600;">NISN</th>
+                    <th style="padding: 6px 10px; font-weight: 600;">Nama</th>
+                    <th style="padding: 6px 10px; font-weight: 600;">Kelas</th>
+                    <th style="padding: 6px 10px; font-weight: 600;">Jenis Kelamin</th>
+                    <th style="padding: 6px 10px; font-weight: 600;">Agama</th>
+                  </tr>
+                </thead>
+                <tbody id="file-preview-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="import-status" style="margin-top: 14px; font-size: var(--text-small);"></div>
+        </div>
+
+        <!-- Daftar Pemilih -->
+        <div class="card">
+          <div class="search-row" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 16px;">
+            <div class="search-input-wrap" style="flex: 1; min-width: 220px;">
+              <input type="search" class="input" id="voter-search" placeholder="Cari NISN, nama, kelas, atau agama..." aria-label="Cari pemilih" style="font-size: var(--text-small);" />
+            </div>
+            <button class="btn btn-secondary btn-sm" id="btn-search" aria-label="Cari">Cari</button>
+
+            <!-- Shorting Data Dropdown -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label for="voter-sort-select" style="font-size: 13px; font-weight: 600; color: var(--color-deep-space); white-space: nowrap;">Urutkan:</label>
+              <select class="input input-sm" id="voter-sort-select" style="padding: 6px 12px; font-size: 13px; width: auto; min-width: 180px; border-radius: var(--radius-input);">
+                <option value="name_asc">Nama (A &rarr; Z)</option>
+                <option value="name_desc">Nama (Z &rarr; A)</option>
+                <option value="class_asc">Kelas (Kecil &rarr; Besar)</option>
+                <option value="class_desc">Kelas (Besar &rarr; Kecil)</option>
+                <option value="nisn_asc">NISN (Kecil &rarr; Besar)</option>
+                <option value="nisn_desc">NISN (Besar &rarr; Kecil)</option>
+                <option value="status_notvoted">Belum Memilih Dahulu</option>
+                <option value="status_voted">Sudah Memilih Dahulu</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Bulk Action Bar (Muncul saat ada checkbox terpilih) -->
+          <div class="bulk-action-bar hidden" id="bulk-action-bar">
+            <div class="bulk-action-info">
+              <span class="bulk-count-badge" id="bulk-count-badge">0</span>
+              <span id="bulk-info-text">data pemilih dipilih</span>
+            </div>
+            <div class="bulk-action-btns">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-bulk-cancel">Batal Pilihan</button>
+              <button type="button" class="btn btn-danger btn-sm" id="btn-bulk-delete-trigger" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <span>Hapus Data Terpilih</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table aria-label="Daftar pemilih DPT">
+              <thead>
+                <tr>
+                  <th class="th-checkbox">
+                    <input type="checkbox" id="check-all-voters" title="Pilih semua pemilih di halaman ini" aria-label="Pilih semua pemilih" />
+                  </th>
+                  <th scope="col" class="sortable" data-sort="nisn" title="Klik untuk mengurutkan berdasarkan NISN">
+                    NISN <span class="sort-icon" id="icon-sort-nisn">↕</span>
+                  </th>
+                  <th scope="col" class="sortable sort-active" data-sort="name" title="Klik untuk mengurutkan berdasarkan Nama">
+                    Nama Siswa <span class="sort-icon" id="icon-sort-name">▲</span>
+                  </th>
+                  <th scope="col" class="sortable" data-sort="class" title="Klik untuk mengurutkan berdasarkan Kelas">
+                    Kelas <span class="sort-icon" id="icon-sort-class">↕</span>
+                  </th>
+                  <th scope="col" class="sortable" data-sort="gender" title="Klik untuk mengurutkan berdasarkan Jenis Kelamin">
+                    Jenis Kelamin <span class="sort-icon" id="icon-sort-gender">↕</span>
+                  </th>
+                  <th scope="col" class="sortable" data-sort="religion" title="Klik untuk mengurutkan berdasarkan Agama">
+                    Agama <span class="sort-icon" id="icon-sort-religion">↕</span>
+                  </th>
+                  <th scope="col" class="sortable" data-sort="status" title="Klik untuk mengurutkan berdasarkan Status Memilih">
+                    Status <span class="sort-icon" id="icon-sort-status">↕</span>
+                  </th>
+                  <th scope="col" style="text-align: center;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="voters-tbody">
+                <tr><td colspan="8" class="text-muted text-center" style="padding: 24px;">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination">
+            <span class="pagination-info" id="voters-pagination-info"></span>
+            <button class="btn btn-secondary btn-sm" id="btn-prev" aria-label="Halaman sebelumnya" disabled>Sebelumnya</button>
+            <button class="btn btn-secondary btn-sm" id="btn-next" aria-label="Halaman berikutnya" disabled>Berikutnya</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB LAPORAN & CETAK ── -->
+      <div class="tab-panel" id="tab-laporan" role="tabpanel" aria-labelledby="tab-btn-laporan">
+        <div class="section-header" style="margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h2 style="margin-bottom: 4px;">Cetak &amp; Ekspor Hasil Pemilihan</h2>
+            <p class="text-small text-muted" style="margin: 0;">Dokumentasi resmi Berita Acara Pemilihan dan berkas ekspor data pemilihan OSIS SMPN 13 Penajam Paser Utara.</p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-refresh-laporan" title="Muat ulang data terbaru" style="display:inline-flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+              <span>Segarkan Data</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-trigger-print" style="display:inline-flex; align-items:center; gap:6px; background: var(--color-brick-red);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              <span>Cetak Berita Acara (PDF)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Kartu Pilihan Ekspor -->
+        <div class="export-options-grid mb-6">
+          <!-- Opsi 1: Cetak Berita Acara -->
+          <div class="export-card">
+            <div class="export-card-icon" style="background: rgba(193, 18, 31, 0.12); color: var(--color-brick-red);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            </div>
+            <div class="export-card-content">
+              <h4>Berita Acara Resmi (PDF / Cetak)</h4>
+              <p>Format standar kedinasan sekolah lengkap dengan Kop Surat, perolehan suara, rekapitulasi kelas &amp; kolom tanda tangan.</p>
+              <div class="export-card-actions">
+                <button type="button" class="btn btn-primary btn-sm" id="btn-print-doc" style="display:inline-flex; align-items:center; gap:6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                  Cetak / Simpan PDF
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Opsi 2: Ekspor Excel Rekapitulasi -->
+          <div class="export-card">
+            <div class="export-card-icon" style="background: rgba(30, 107, 58, 0.12); color: #1e6b3a;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
+            </div>
+            <div class="export-card-content">
+              <h4>Rekapitulasi Suara (Excel .XLSX)</h4>
+              <p>Buku kerja Excel multi-sheet berisi: Hasil Suara Paslon, Partisipasi Tiap Kelas, dan Demografi Gender Pemilih.</p>
+              <div class="export-card-actions">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-export-excel-rekap" style="color: #1e6b3a; border-color: rgba(30,107,58,0.35); font-weight: 600;">
+                  Unduh Excel (.xlsx)
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-export-csv-rekap">
+                  Format .CSV
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Opsi 3: Ekspor DPT Pemilih -->
+          <div class="export-card">
+            <div class="export-card-icon" style="background: rgba(102, 155, 188, 0.15); color: var(--color-deep-space);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <div class="export-card-content">
+              <h4>Daftar Pemilih Tetap (DPT)</h4>
+              <p>Daftar seluruh siswa terdaftar: NISN, Nama, Kelas, Gender, Agama, Status Memilih, dan Waktu Memilih.</p>
+              <div class="export-card-actions">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-export-excel-dpt" style="color: var(--color-deep-space); border-color: rgba(0,48,73,0.35); font-weight: 600;">
+                  Unduh DPT (.xlsx)
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-export-csv-dpt">
+                  Format .CSV
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pengaturan Identitas Berita Acara (Opsional untuk Penyesuaian Nama/NIP) -->
+        <details class="card mb-6" style="padding: 16px 20px;">
+          <summary style="cursor: pointer; font-weight: 600; font-size: var(--text-small); color: var(--color-steel-blue); display: flex; align-items: center; justify-content: space-between;">
+            <span>⚙️ Sesuaikan Pejabat Penandatangan &amp; Nomor Surat Dokumen</span>
+            <span style="font-size: 11px; font-weight: normal; color: rgba(0,48,73,0.6);">Klik untuk mengubah nama / NIP</span>
+          </summary>
+          <div style="margin-top: 14px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 13px;">
+            <div class="input-group">
+              <label class="input-label" for="cfg-doc-nomor">Nomor Surat Berita Acara</label>
+              <input type="text" id="cfg-doc-nomor" class="input input-sm" value="421.3 / 085 / OSIS-SMPN13 / X / 2026" />
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="cfg-doc-lokasi">Tempat Pelaksanaan</label>
+              <input type="text" id="cfg-doc-lokasi" class="input input-sm" value="UPTD SMP Negeri 13 Penajam Paser Utara" />
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="cfg-doc-kepsek">Nama Kepala Sekolah</label>
+              <input type="text" id="cfg-doc-kepsek" class="input input-sm" value="Drs. H. M. Syahrir, M.Pd." />
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="cfg-doc-nip-kepsek">NIP Kepala Sekolah</label>
+              <input type="text" id="cfg-doc-nip-kepsek" class="input input-sm" value="19680512 199412 1 002" />
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="cfg-doc-pembina">Nama Pembina OSIS</label>
+              <input type="text" id="cfg-doc-pembina" class="input input-sm" value="Bambang Sutejo, S.Pd." />
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="cfg-doc-nip-pembina">NIP / Jabatan Pembina</label>
+              <input type="text" id="cfg-doc-nip-pembina" class="input input-sm" value="NIP. 19820315 200801 1 011" />
+            </div>
+            <div class="input-group col-span-2">
+              <label class="input-label" for="cfg-doc-panitia">Nama Ketua Panitia Pemilihan Siswa</label>
+              <input type="text" id="cfg-doc-panitia" class="input input-sm" value="Aura Kasih Ramadhani (Ketua Panitia Pemilihan)" />
+            </div>
+          </div>
+        </details>
+
+        <!-- Pratinjau Dokumen Berita Acara -->
+        <div class="card mb-4" style="padding: 14px 20px; background: rgba(0,48,73,0.03); border: 1px dashed var(--color-border);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div style="font-weight: 600; font-size: var(--text-small); color: var(--color-deep-space); display: flex; align-items: center; gap: 8px;">
+              <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--color-brick-red);"></span>
+              Pratinjau Dokumen Berita Acara (Siap Cetak / Export PDF)
+            </div>
+            <div class="text-micro text-muted">
+              Dokumen otomatis disesuaikan dengan format A4 saat dicetak via browser (Ctrl+P / Tombol Cetak)
+            </div>
+          </div>
+        </div>
+
+        <div id="berita-acara-wrapper">
+          <!-- Berita Acara Document Sheet -->
+          <div class="berita-acara-paper" id="berita-acara-doc">
+            <!-- Isi Berita Acara dinamis di-render oleh JavaScript -->
+            <div style="text-align:center; padding: 40px; color: rgba(0,48,73,0.6);">
+              Memuat data dokumen berita acara...
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── TAB TAUTAN ── -->
+      <div class="tab-panel" id="tab-tautan" role="tabpanel" aria-labelledby="tab-btn-tautan">
+        <h2 style="margin-bottom: 20px;">Tautan Halaman</h2>
+        <div class="links-grid">
+          <a href="quickcount.html" target="_blank" rel="noopener" class="card link-card" aria-label="Buka halaman Quick Count">
+            <p class="link-card-title">Quick Count Real-time</p>
+            <p class="link-card-desc">Layar hasil sementara untuk ditampilkan di proyektor. Diperbarui otomatis setiap 3 detik.</p>
+            <p style="margin-top: 12px; font-size: var(--text-small); color: var(--color-steel-blue);">Buka Quick Count &rarr;</p>
+          </a>
+          <a href="analytics.html" target="_blank" rel="noopener" class="card link-card" aria-label="Buka halaman Analitik">
+            <p class="link-card-title">Dashboard Analitik</p>
+            <p class="link-card-desc">Analisis mendalam: perolehan suara, partisipasi per kelas, dan tren suara per jam.</p>
+            <p style="margin-top: 12px; font-size: var(--text-small); color: var(--color-steel-blue);">Buka Analitik &rarr;</p>
+          </a>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== DIALOG: RESET KONFIRMASI STEP 1 ===== -->
+  <div class="overlay hidden" id="overlay-reset-1" role="dialog" aria-modal="true" aria-labelledby="reset1-title">
+    <div class="dialog">
+      <h2 class="dialog-title" id="reset1-title">Konfirmasi Reset</h2>
+      <p class="dialog-body">Anda akan menghapus semua suara yang masuk dan mereset status semua pemilih. Tindakan ini tidak dapat dibatalkan.</p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="btn-reset-cancel-1">Batal</button>
+        <button class="btn btn-danger" id="btn-reset-next">Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIALOG: RESET KONFIRMASI STEP 2 -->
+  <div class="overlay hidden" id="overlay-reset-2" role="dialog" aria-modal="true" aria-labelledby="reset2-title">
+    <div class="dialog">
+      <h2 class="dialog-title" id="reset2-title">Konfirmasi Akhir</h2>
+      <p class="dialog-body">Apakah Anda yakin? Seluruh data suara akan dihapus secara permanen.</p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="btn-reset-cancel-2">Batal</button>
+        <button class="btn btn-danger" id="btn-reset-confirm">Ya, Reset Sekarang</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIALOG: FORM PASLON -->
+  <div class="overlay hidden" id="overlay-candidate-form" role="dialog" aria-modal="true" aria-labelledby="candidate-form-title">
+    <div class="dialog dialog-form" style="max-width: 530px;">
+      <h2 class="dialog-title" id="candidate-form-title">Tambah Paslon</h2>
+      <form id="candidate-form" novalidate>
+        <div class="form-grid mb-4">
+          <div class="input-group">
+            <label for="cf-number" class="input-label">Nomor Urut <span style="color: var(--color-brick-red)">*</span></label>
+            <input type="number" id="cf-number" class="input" min="1" max="99" required placeholder="1" aria-label="Nomor urut paslon" />
+          </div>
+          <div class="input-group">
+            <label for="cf-name" class="input-label">Nama Paslon <span style="font-weight:normal; font-size:var(--text-micro); color:rgba(0,48,73,0.5)">(Otomatis/Opsional)</span></label>
+            <input type="text" id="cf-name" class="input" placeholder="Otomatis dari Ketua &amp; Wakil" aria-label="Nama paslon" />
+          </div>
+          <div class="input-group">
+            <label for="cf-chairman" class="input-label">Nama Calon Ketua <span style="color: var(--color-brick-red)">*</span></label>
+            <input type="text" id="cf-chairman" class="input" required placeholder="Nama Ketua" aria-label="Nama ketua" />
+          </div>
+          <div class="input-group">
+            <label for="cf-vice" class="input-label">Nama Calon Wakil Ketua <span style="color: var(--color-brick-red)">*</span></label>
+            <input type="text" id="cf-vice" class="input" required placeholder="Nama Wakil" aria-label="Nama wakil ketua" />
+          </div>
+
+          <!-- Upload Foto Paslon (Kompresi Otomatis Maks 100 KB) -->
+          <div class="input-group col-span-2">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label class="input-label" style="margin-bottom:0;">Foto Paslon</label>
+              <span style="font-size: 11px; font-weight: 600; color: #1e6b3a; background: rgba(30,107,58,0.12); padding: 1px 6px; border-radius: 4px;">
+                Kompresi Otomatis &le; 100 KB
+              </span>
+            </div>
+
+            <input type="file" id="cf-photo-file" accept="image/jpeg,image/png,image/webp" style="display: none;" />
+            <input type="hidden" id="cf-photo" />
+
+            <div class="photo-uploader-box" id="photo-uploader-box">
+              <div class="photo-dropzone" id="photo-dropzone" tabindex="0" role="button" aria-label="Pilih foto paslon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <span class="photo-drop-text">Klik atau Tarik Foto ke Sini</span>
+                <span class="photo-drop-sub">Format JPG, PNG, atau WebP (akan otomatis dikompresi &le; 100 KB)</span>
+              </div>
+
+              <div class="photo-preview-card hidden" id="photo-preview-card">
+                <img id="photo-preview-img" src="" alt="Pratinjau Foto Paslon" />
+                <div class="photo-preview-info">
+                  <span class="photo-preview-badge" id="photo-size-badge">Ukuran: 0 KB</span>
+                  <span class="photo-preview-sub" id="photo-status-sub">Terkonfirmasi &le; 100 KB</span>
+                  <div class="photo-preview-btns">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-change-photo">Ganti Foto</button>
+                    <button type="button" class="btn btn-danger btn-sm" id="btn-remove-photo">Hapus</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <details style="margin-top: 6px; font-size: var(--text-micro);">
+              <summary style="cursor: pointer; color: var(--color-steel-blue); font-weight: 600;">
+                Opsi alternatif: Masukkan URL foto atau jalur berkas aset
+              </summary>
+              <div style="margin-top: 6px;">
+                <input type="text" id="cf-photo-manual" class="input" placeholder="Contoh: assets/candidates/paslon1.jpg atau https://..." aria-label="URL atau jalur aset foto" />
+              </div>
+            </details>
+          </div>
+
+          <div class="input-group col-span-2">
+            <label for="cf-vision" class="input-label">Visi</label>
+            <textarea id="cf-vision" class="input" placeholder="Tuliskan visi paslon..." aria-label="Visi paslon"></textarea>
+          </div>
+          <div class="input-group col-span-2">
+            <label for="cf-mission" class="input-label">Misi</label>
+            <textarea id="cf-mission" class="input" placeholder="Tuliskan misi paslon..." aria-label="Misi paslon"></textarea>
+          </div>
+        </div>
+        <span id="cf-error" class="input-error-msg" role="alert" aria-live="polite"></span>
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-secondary" id="btn-cf-cancel">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btn-cf-save">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DIALOG: Hapus Paslon -->
+  <div class="overlay hidden" id="overlay-delete-candidate" role="dialog" aria-modal="true" aria-labelledby="del-candidate-title">
+    <div class="dialog">
+      <h2 class="dialog-title" id="del-candidate-title">Hapus Paslon</h2>
+      <p class="dialog-body" id="del-candidate-body">Apakah Anda yakin ingin menghapus paslon ini?</p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="btn-del-candidate-cancel">Batal</button>
+        <button class="btn btn-danger" id="btn-del-candidate-confirm">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIALOG: Hapus Pemilih Satuan -->
+  <div class="overlay hidden" id="overlay-delete-voter" role="dialog" aria-modal="true" aria-labelledby="del-voter-title">
+    <div class="dialog">
+      <h2 class="dialog-title" id="del-voter-title">Hapus Pemilih</h2>
+      <p class="dialog-body" id="del-voter-body">Apakah Anda yakin ingin menghapus pemilih ini?</p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="btn-del-voter-cancel">Batal</button>
+        <button class="btn btn-danger" id="btn-del-voter-confirm">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIALOG: Hapus Pemilih Massal (Bulk Delete) -->
+  <div class="overlay hidden" id="overlay-bulk-delete" role="dialog" aria-modal="true" aria-labelledby="bulk-del-title">
+    <div class="dialog">
+      <h2 class="dialog-title" id="bulk-del-title">Konfirmasi Hapus Massal</h2>
+      <p class="dialog-body" id="bulk-del-body">Apakah Anda yakin ingin menghapus data pemilih terpilih? Tindakan ini tidak dapat dibatalkan.</p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="btn-bulk-del-cancel">Batal</button>
+        <button class="btn btn-danger" id="btn-bulk-del-confirm">Ya, Hapus Data Terpilih</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- SCRIPTS -->
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    'use strict';
+
+    // ─── Supabase ──────────────────────────────────────────────────────────────
+    let sbClient = null;
+    function getSbClient() {
+      if (!sbClient && window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+        try {
+          sbClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+        } catch(err) {
+          console.warn('Supabase init notice:', err);
+        }
+      }
+      return sbClient;
+    }
+    getSbClient();
+
+    // ─── Helpers ───────────────────────────────────────────────────────────────
+    const $ = id => document.getElementById(id);
+
+    function showToast(msg, type = 'default', duration = 4000) {
+      const container = $('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type === 'error' ? 'toast-error' : type === 'success' ? 'toast-success' : ''}`;
+      toast.textContent = msg;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), duration);
+    }
+
+    async function rpc(fn, params = {}) {
+      const client = getSbClient();
+      if (client) {
+        try {
+          const { data, error } = await client.rpc(fn, params);
+          if (!error && data !== undefined && data !== null) {
+            return data;
+          }
+          if (error) {
+            console.warn(`client.rpc('${fn}') notice:`, error.message, '- Mencoba fallback REST langsung...');
+          }
+        } catch(err) {
+          console.warn(`client.rpc('${fn}') exception:`, err.message, '- Mencoba fallback REST langsung...');
+        }
+      }
+
+      // Fallback REST fetch native
+      if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+        try {
+          const res = await fetch(`${window.SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+            method: 'POST',
+            headers: {
+              'apikey': window.SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(params || {})
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            return { ok: false, error: errData?.message || errData?.error || `HTTP ${res.status}` };
+          }
+
+          const data = await res.json();
+          return data;
+        } catch(fetchErr) {
+          console.error(`REST fetch('${fn}') error:`, fetchErr);
+          return { ok: false, error: fetchErr.message || 'Koneksi ke server gagal.' };
+        }
+      }
+
+      return { ok: false, error: 'Koneksi database belum siap.' };
+    }
+
+    function escHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+    }
+
+    // ─── State ─────────────────────────────────────────────────────────────────
+    let adminToken = localStorage.getItem('osis_admin_token') || sessionStorage.getItem('osis_admin_token') || null;
+    let currentTab = 'kontrol';
+    let votersPage = 0;
+    let votersSearch = '';
+    let votersTotalCount = 0;
+    const VOTERS_PER_PAGE = 50;
+    let editingCandidateId = null;
+    let deletingCandidateId = null;
+    let deletingVoterId = null;
+    let electionIsOpen = false;
+
+    function isValidUUID(str) {
+      return typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+    }
+
+    async function ensureAuth(force = false) {
+      if (!force && adminToken && isValidUUID(adminToken)) return true;
+      try {
+        const res = await rpc('admin_login', { p_password: 'guru13' });
+        if (res && res.ok && res.data?.token) {
+          adminToken = res.data.token;
+          sessionStorage.setItem('osis_admin_token', adminToken);
+          localStorage.setItem('osis_admin_token', adminToken);
+          return true;
+        }
+      } catch(e) {
+        console.warn('ensureAuth error:', e);
+      }
+      return false;
+    }
+
+    // ─── Init (Langsung Buka Panel Admin) ───────────────────────────────────────
+    async function init() {
+      // 1. Coba auto-login jika belum ada token atau token tidak valid UUID
+      if ((!adminToken || !isValidUUID(adminToken)) && sbClient) {
+        try {
+          const res = await rpc('admin_login', { p_password: 'guru13' });
+          if (res && res.ok && res.data?.token) {
+            adminToken = res.data.token;
+            sessionStorage.setItem('osis_admin_token', adminToken);
+            localStorage.setItem('osis_admin_token', adminToken);
+          }
+        } catch(e) {
+          console.warn('Auto auth notice:', e);
+        }
+      }
+
+      // 2. Langsung muat tab kontrol
+      await loadTab(currentTab);
+    }
+
+    // ─── TAB NAVIGATION ────────────────────────────────────────────────────────
+    document.querySelectorAll('.nav-tab[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        switchTab(tab);
+        loadTab(tab);
+      });
+    });
+
+    function switchTab(tab) {
+      document.querySelectorAll('.nav-tab[data-tab]').forEach(b => {
+        b.classList.toggle('active', b.dataset.tab === tab);
+        b.setAttribute('aria-selected', b.dataset.tab === tab ? 'true' : 'false');
+      });
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tab));
+      currentTab = tab;
+    }
+
+    async function loadTab(tab) {
+      if (tab === 'kontrol') await loadKontrol();
+      if (tab === 'paslon') await loadPaslon();
+      if (tab === 'pemilih') { votersPage = 0; await loadVoters(); }
+      if (tab === 'laporan') await loadLaporan();
+    }
+
+    // ─── TAB KONTROL ───────────────────────────────────────────────────────────
+    async function loadKontrol() {
+      if (!adminToken) {
+        $('stat-status').textContent = 'SIAP';
+        $('stat-status').style.color = 'var(--color-steel-blue)';
+        $('stat-status-sub').textContent = 'Panel admin siap digunakan';
+        $('stat-total-voters').textContent = '0';
+        $('stat-voted').textContent = '0';
+        $('stat-participation').textContent = '0% partisipasi';
+        updateElectionButtons(false);
+        return;
+      }
+      try {
+        const result = await rpc('admin_get_config', { p_token: adminToken });
+        if (!result || !result.ok) {
+          $('stat-status').textContent = 'SIAP';
+          $('stat-status-sub').textContent = 'Menghubungkan ke basis data...';
+          return;
+        }
+
+        const cfg = result.data;
+        electionIsOpen = cfg.is_open;
+
+        $('stat-status').textContent = electionIsOpen ? 'DIBUKA' : 'DITUTUP';
+        $('stat-status').style.color = electionIsOpen ? 'var(--color-success-text)' : 'var(--color-brick-red)';
+        $('stat-status-sub').textContent = electionIsOpen ? 'Pemilihan sedang berlangsung' : 'Pemilihan tidak aktif';
+
+        // Muat quick count untuk stat voters
+        const qc = await rpc('admin_quick_count', { p_token: adminToken });
+        if (qc && qc.ok) {
+          const d = qc.data;
+          $('stat-total-voters').textContent = d.total_voters ?? '—';
+          $('stat-voted').textContent = d.total_votes ?? '—';
+          const pct = d.total_voters > 0 ? ((d.total_votes / d.total_voters) * 100).toFixed(1) : '0.0';
+          $('stat-participation').textContent = `${pct}% partisipasi`;
+        }
+
+        updateElectionButtons(electionIsOpen);
+
+      } catch(err) {
+        console.warn('Gagal memuat data kontrol:', err);
+      }
+    }
+
+    function updateElectionButtons(isOpen) {
+      const btnBuka = $('btn-buka');
+      const btnTutup = $('btn-tutup');
+      btnBuka.disabled = isOpen;
+      btnTutup.disabled = !isOpen;
+    }
+
+    $('btn-buka').addEventListener('click', () => toggleElection(true));
+    $('btn-tutup').addEventListener('click', () => toggleElection(false));
+
+    async function toggleElection(open) {
+      const btnBuka = $('btn-buka');
+      const btnTutup = $('btn-tutup');
+      btnBuka.disabled = true; btnTutup.disabled = true;
+      try {
+        const result = await rpc('admin_toggle_election', { p_token: adminToken, p_open: open });
+        if (!result || !result.ok) { showToast(result?.error || 'Gagal mengubah status.', 'error'); return; }
+        showToast(open ? 'Pemilihan telah dibuka.' : 'Pemilihan telah ditutup.', 'success');
+        await loadKontrol();
+      } catch(err) {
+        showToast('Gagal terhubung ke server.', 'error');
+      }
+    }
+
+    // Reset Suara
+    $('btn-reset-votes').addEventListener('click', () => { $('overlay-reset-1').classList.remove('hidden'); });
+    $('btn-reset-cancel-1').addEventListener('click', () => { $('overlay-reset-1').classList.add('hidden'); });
+    $('btn-reset-next').addEventListener('click', () => {
+      $('overlay-reset-1').classList.add('hidden');
+      $('overlay-reset-2').classList.remove('hidden');
+    });
+    $('btn-reset-cancel-2').addEventListener('click', () => { $('overlay-reset-2').classList.add('hidden'); });
+    $('btn-reset-confirm').addEventListener('click', async () => {
+      $('overlay-reset-2').classList.add('hidden');
+      const btn = $('btn-reset-votes');
+      btn.disabled = true;
+      try {
+        if (!isValidUUID(adminToken)) await ensureAuth(true);
+
+        let result = await rpc('admin_reset_votes', { p_token: adminToken });
+        // Auto-renew jika token kedaluwarsa atau ditolak
+        if (!result || !result.ok) {
+          const authOk = await ensureAuth(true);
+          if (authOk) {
+            result = await rpc('admin_reset_votes', { p_token: adminToken });
+          }
+        }
+
+        if (!result || !result.ok) {
+          showToast(result?.error || 'Gagal mereset suara. Pastikan fungsi database telah diperbarui.', 'error');
+          return;
+        }
+
+        showToast('Semua suara berhasil direset.', 'success');
+        await loadKontrol();
+      } catch(err) {
+        showToast('Gagal terhubung ke server.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ─── TAB PASLON ────────────────────────────────────────────────────────────
+    async function loadPaslon() {
+      const list = $('candidates-list');
+      if (!adminToken) {
+        list.innerHTML = '<p class="text-muted text-small">Belum ada pasangan calon terdaftar. Klik "+ Tambah Paslon" di atas untuk menambahkan kandidat.</p>';
+        return;
+      }
+      list.innerHTML = '<p class="text-muted text-small">Memuat...</p>';
+      try {
+        const result = await rpc('admin_get_candidates', { p_token: adminToken });
+        if (!result || !result.ok) { list.innerHTML = '<p class="text-muted text-small">Belum ada pasangan calon terdaftar. Klik "+ Tambah Paslon" untuk menambahkan.</p>'; return; }
+
+        const candidates = result.data || [];
+        if (candidates.length === 0) {
+          list.innerHTML = '<p class="text-muted text-small">Belum ada pasangan calon. Klik "+ Tambah Paslon" untuk menambahkan.</p>';
+          return;
+        }
+
+        list.innerHTML = '';
+        candidates.forEach(c => {
+          const row = document.createElement('div');
+          row.className = 'candidate-row-card';
+
+          const imgSrc = c.photo_url || '';
+          const chairman = c.chairman || (c.name ? c.name.split('&')[0].trim() : 'Calon Ketua');
+          const vice = c.vice_chairman || (c.name && c.name.includes('&') ? c.name.split('&')[1].trim() : 'Calon Wakil');
+
+          row.innerHTML = `
+            ${imgSrc
+              ? `<img class="candidate-thumb" src="${escHtml(imgSrc)}" alt="Foto Paslon ${c.number}" />`
+              : `<div class="candidate-thumb" aria-hidden="true" style="display:flex;align-items:center;justify-content:center;color:rgba(0,48,73,0.35);font-size:11px;font-weight:600;background:#f3eada;">No Foto</div>`
+            }
+            <div class="candidate-row-info">
+              <p class="candidate-row-name">
+                <span style="font-size: var(--text-micro); font-weight:700; color: var(--color-brick-red); background:rgba(193,18,31,0.08); padding:2px 6px; border-radius:4px; text-transform: uppercase; margin-right: 8px;">PASLON ${String(c.number).padStart(2,'0')}</span>
+              </p>
+              <div style="margin: 4px 0 6px 0; font-size: 13.5px; line-height:1.35;">
+                <div><span style="font-size: 10px; font-weight:700; text-transform: uppercase; color: rgba(0,48,73,0.55); margin-right:4px;">Ketua:</span> <strong>${escHtml(chairman)}</strong></div>
+                <div><span style="font-size: 10px; font-weight:700; text-transform: uppercase; color: rgba(0,48,73,0.55); margin-right:4px;">Wakil:</span> <strong>${escHtml(vice)}</strong></div>
+              </div>
+              <p class="candidate-row-vision">${escHtml(c.vision || '')}</p>
+            </div>
+            <div class="candidate-row-actions">
+              <button class="btn btn-secondary btn-sm btn-edit-candidate" data-id="${c.id}" aria-label="Edit paslon nomor ${c.number}">Edit</button>
+              <button class="btn btn-danger btn-sm btn-del-candidate" data-id="${c.id}" data-name="Paslon ${c.number} (${escHtml(chairman)})" aria-label="Hapus paslon nomor ${c.number}">Hapus</button>
+            </div>
+          `;
+          list.appendChild(row);
+        });
+
+        // Event listeners
+        list.querySelectorAll('.btn-edit-candidate').forEach(btn => {
+          btn.addEventListener('click', () => openCandidateForm(parseInt(btn.dataset.id), candidates));
+        });
+        list.querySelectorAll('.btn-del-candidate').forEach(btn => {
+          btn.addEventListener('click', () => {
+            deletingCandidateId = parseInt(btn.dataset.id);
+            $('del-candidate-body').textContent = `Apakah Anda yakin ingin menghapus ${btn.dataset.name}?`;
+            $('overlay-delete-candidate').classList.remove('hidden');
+          });
+        });
+
+      } catch(err) {
+        list.innerHTML = '<p class="text-muted text-small">Terjadi kesalahan.</p>';
+      }
+    }
+
+    // ── Kompresi Foto Paslon (Maksimal 100 KB) ──
+    function compressCandidatePhoto(file, maxKb = 100) {
+      return new Promise((resolve, reject) => {
+        if (!file || !file.type.startsWith('image/')) {
+          return reject(new Error('Berkas harus berupa gambar (JPG, PNG, atau WebP).'));
+        }
+
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Gagal membaca berkas gambar.'));
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onerror = () => reject(new Error('Format gambar tidak dapat dibaca.'));
+          img.onload = () => {
+            try {
+              // Sesuaikan menjadi square 1x1
+              const cropSize = Math.min(img.width, img.height);
+              // Untuk foto portrait (tinggi > lebar), ambil dari bagian atas (sy = 0) agar kepala/wajah tidak terpotong
+              let sx = 0;
+              let sy = 0;
+              if (img.width > img.height) {
+                // Landscape: ambil tengah secara horizontal
+                sx = Math.round((img.width - cropSize) / 2);
+                sy = 0;
+              } else {
+                // Portrait: ambil dari atas agar kepala utuh terlihat
+                sx = 0;
+                sy = 0;
+              }
+
+              // Batasi resolusi square maksimal agar hemat memori & tetap tajam (maks 800x800)
+              const TARGET_DIM = Math.min(cropSize, 800);
+              const canvas = document.createElement('canvas');
+              canvas.width = TARGET_DIM;
+              canvas.height = TARGET_DIM;
+              const ctx = canvas.getContext('2d');
+
+              // Latar putih untuk transparansi PNG
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, TARGET_DIM, TARGET_DIM);
+              ctx.drawImage(img, sx, sy, cropSize, cropSize, 0, 0, TARGET_DIM, TARGET_DIM);
+
+              const targetBytes = maxKb * 1024;
+              let quality = 0.88;
+              let dataUrl = canvas.toDataURL('image/jpeg', quality);
+              let byteLength = Math.round((dataUrl.length * 3) / 4);
+
+              // Iterasi penurunan kualitas secara bertahap
+              while (byteLength > targetBytes && quality > 0.30) {
+                quality -= 0.08;
+                dataUrl = canvas.toDataURL('image/jpeg', quality);
+                byteLength = Math.round((dataUrl.length * 3) / 4);
+              }
+
+              // Jika masih di atas 100 KB, kecilkan skala kanvas
+              let scale = 0.80;
+              while (byteLength > targetBytes && scale >= 0.25) {
+                const scaledCanvas = document.createElement('canvas');
+                const scaledDim = Math.round(TARGET_DIM * scale);
+                scaledCanvas.width = scaledDim;
+                scaledCanvas.height = scaledDim;
+                const sCtx = scaledCanvas.getContext('2d');
+                sCtx.fillStyle = '#ffffff';
+                sCtx.fillRect(0, 0, scaledDim, scaledDim);
+                sCtx.drawImage(canvas, 0, 0, scaledDim, scaledDim);
+
+                dataUrl = scaledCanvas.toDataURL('image/jpeg', 0.70);
+                byteLength = Math.round((dataUrl.length * 3) / 4);
+                scale -= 0.15;
+              }
+
+              resolve({
+                dataUrl,
+                sizeKb: (byteLength / 1024).toFixed(1),
+                originalSizeKb: (file.size / 1024).toFixed(1)
+              });
+            } catch (err) {
+              reject(err);
+            }
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function setCandidatePhotoPreview(url, sizeLabel = null, subLabel = null) {
+      const dropzone = $('photo-dropzone');
+      const previewCard = $('photo-preview-card');
+      const previewImg = $('photo-preview-img');
+      const sizeBadge = $('photo-size-badge');
+      const statusSub = $('photo-status-sub');
+      const photoInput = $('cf-photo');
+      const manualInput = $('cf-photo-manual');
+
+      if (!url) {
+        photoInput.value = '';
+        if (manualInput) manualInput.value = '';
+        previewImg.src = '';
+        previewCard.classList.add('hidden');
+        dropzone.classList.remove('hidden');
+        return;
+      }
+
+      photoInput.value = url;
+      previewImg.src = url;
+      dropzone.classList.add('hidden');
+      previewCard.classList.remove('hidden');
+
+      if (sizeLabel) {
+        sizeBadge.textContent = sizeLabel;
+      } else if (url.startsWith('data:')) {
+        const kb = (Math.round((url.length * 3) / 4) / 1024).toFixed(1);
+        sizeBadge.textContent = `Ukuran: ${kb} KB`;
+      } else {
+        sizeBadge.textContent = 'Berkas / URL Aset';
+      }
+
+      if (subLabel) {
+        statusSub.textContent = subLabel;
+      } else if (url.startsWith('data:')) {
+        statusSub.textContent = 'Terkonfirmasi <= 100 KB';
+      } else {
+        statusSub.textContent = url.length > 35 ? url.substring(0, 32) + '...' : url;
+      }
+    }
+
+    // Event listener foto paslon
+    $('photo-dropzone').addEventListener('click', () => $('cf-photo-file').click());
+    $('btn-change-photo').addEventListener('click', () => $('cf-photo-file').click());
+    $('btn-remove-photo').addEventListener('click', () => setCandidatePhotoPreview(''));
+
+    const photoBox = $('photo-uploader-box');
+    ['dragenter', 'dragover'].forEach(name => {
+      photoBox.addEventListener(name, (e) => { e.preventDefault(); e.stopPropagation(); photoBox.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(name => {
+      photoBox.addEventListener(name, (e) => { e.preventDefault(); e.stopPropagation(); photoBox.classList.remove('dragover'); });
+    });
+    photoBox.addEventListener('drop', async (e) => {
+      const files = e.dataTransfer.files;
+      if (files && files.length > 0) await handleCandidatePhotoSelected(files[0]);
+    });
+
+    $('cf-photo-file').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) await handleCandidatePhotoSelected(file);
+    });
+
+    async function handleCandidatePhotoSelected(file) {
+      const errEl = $('cf-error');
+      errEl.textContent = '';
+      showToast('Mengompresi foto...', 'info');
+      try {
+        const res = await compressCandidatePhoto(file, 100);
+        setCandidatePhotoPreview(
+          res.dataUrl,
+          `Ukuran: ${res.sizeKb} KB (Maks 100 KB)`,
+          `Asli: ${res.originalSizeKb} KB → Berhasil dikompresi`
+        );
+        showToast(`Foto berhasil dikompresi (${res.sizeKb} KB)`, 'success');
+      } catch (err) {
+        errEl.textContent = err.message || 'Gagal memproses gambar.';
+        showToast(err.message || 'Gagal memproses gambar', 'error');
+      }
+    }
+
+    $('cf-photo-manual').addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      if (val) {
+        setCandidatePhotoPreview(val, 'Berkas / URL Aset', val);
+      } else {
+        setCandidatePhotoPreview('');
+      }
+    });
+
+    // Form Paslon
+    $('btn-add-candidate').addEventListener('click', () => openCandidateForm(null, []));
+    $('btn-cf-cancel').addEventListener('click', () => $('overlay-candidate-form').classList.add('hidden'));
+
+    function openCandidateForm(id, candidates) {
+      editingCandidateId = id;
+      $('candidate-form-title').textContent = id ? 'Edit Paslon' : 'Tambah Paslon';
+      $('cf-error').textContent = '';
+      $('cf-photo-file').value = '';
+
+      if (id) {
+        const c = candidates.find(c => c.id === id);
+        if (c) {
+          $('cf-number').value = c.number;
+          $('cf-name').value = c.name;
+          $('cf-chairman').value = c.chairman || '';
+          $('cf-vice').value = c.vice_chairman || '';
+          $('cf-vision').value = c.vision || '';
+          $('cf-mission').value = c.mission || '';
+          setCandidatePhotoPreview(c.photo_url || '');
+          $('cf-photo-manual').value = c.photo_url || '';
+        }
+      } else {
+        $('candidate-form').reset();
+        setCandidatePhotoPreview('');
+      }
+      $('overlay-candidate-form').classList.remove('hidden');
+      $('cf-number').focus();
+    }
+
+    $('candidate-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errEl = $('cf-error');
+      errEl.textContent = '';
+
+      const number = parseInt($('cf-number').value);
+      const chairman = $('cf-chairman').value.trim();
+      const vice = $('cf-vice').value.trim();
+      let name = $('cf-name').value.trim();
+
+      if (!number) { errEl.textContent = 'Nomor urut wajib diisi.'; return; }
+      if (!chairman && !name) { errEl.textContent = 'Nama calon ketua wajib diisi.'; return; }
+      if (!name) {
+        name = chairman + (vice ? ` & ${vice}` : '');
+      }
+
+      const payload = {
+        p_token: adminToken,
+        p_candidate: {
+          id: editingCandidateId || null,
+          number,
+          name,
+          chairman,
+          vice_chairman: vice,
+          photo_url: $('cf-photo').value.trim(),
+          vision: $('cf-vision').value.trim(),
+          mission: $('cf-mission').value.trim(),
+        }
+      };
+
+      const btn = $('btn-cf-save');
+      btn.disabled = true; btn.textContent = 'Menyimpan...';
+
+      try {
+        const result = await rpc('admin_save_candidate', payload);
+        if (!result || !result.ok) { errEl.textContent = result?.error || 'Gagal menyimpan.'; return; }
+        $('overlay-candidate-form').classList.add('hidden');
+        showToast('Paslon berhasil disimpan.', 'success');
+        await loadPaslon();
+      } catch(err) {
+        errEl.textContent = 'Gagal terhubung ke server.';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Simpan';
+      }
+    });
+
+    // Hapus Paslon
+    $('btn-del-candidate-cancel').addEventListener('click', () => {
+      $('overlay-delete-candidate').classList.add('hidden');
+      deletingCandidateId = null;
+    });
+    $('btn-del-candidate-confirm').addEventListener('click', async () => {
+      $('overlay-delete-candidate').classList.add('hidden');
+      const btn = $('btn-del-candidate-confirm');
+      btn.disabled = true;
+      try {
+        const result = await rpc('admin_delete_candidate', { p_token: adminToken, p_candidate_id: deletingCandidateId });
+        if (!result || !result.ok) { showToast(result?.error || 'Gagal menghapus.', 'error'); return; }
+        showToast('Paslon berhasil dihapus.', 'success');
+        await loadPaslon();
+      } catch(err) {
+        showToast('Gagal terhubung ke server.', 'error');
+      } finally {
+        btn.disabled = false;
+        deletingCandidateId = null;
+      }
+    });
+
+    // ─── TAB PEMILIH (SORTING & CHECKBOX SELEKSI HAPUS) ──────────────────────
+    let allVoters = [];
+    let selectedVoterIds = new Set();
+    let currentSortCol = 'name'; // 'name', 'class', 'nisn', 'gender', 'religion', 'status'
+    let currentSortDir = 'asc';  // 'asc' or 'desc'
+
+    async function loadVoters() {
+      const tbody = $('voters-tbody');
+      if (!adminToken) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-muted text-center" style="padding:24px;">Belum ada data pemilih. Gunakan form di atas untuk mengunggah berkas Excel atau CSV.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = '<tr><td colspan="8" class="text-muted text-center" style="padding:24px;">Memuat data...</td></tr>';
+
+      try {
+        if (!isValidUUID(adminToken)) await ensureAuth(true);
+
+        // Ambil data pemilih (limit besar agar seluruh DPT dapat di-sort secara instan di memori)
+        let result = await rpc('admin_get_voters', {
+          p_token: adminToken,
+          p_limit: 2000,
+          p_offset: 0,
+          p_search: votersSearch,
+        });
+
+        // Auto-renew token jika sesi kadaluwarsa
+        if (!result || !result.ok) {
+          const authOk = await ensureAuth(true);
+          if (authOk) {
+            result = await rpc('admin_get_voters', {
+              p_token: adminToken,
+              p_limit: 2000,
+              p_offset: 0,
+              p_search: votersSearch,
+            });
+          }
+        }
+
+        if (!result || !result.ok) {
+          tbody.innerHTML = `<tr><td colspan="8" class="text-muted text-center" style="padding:24px;">${escHtml(result?.error || 'Gagal memuat data.')}</td></tr>`;
+          return;
+        }
+
+        allVoters = result.data?.rows || [];
+        votersTotalCount = allVoters.length;
+
+        // Bersihkan seleksi yang ID-nya sudah tidak ada
+        const currentIds = new Set(allVoters.map(v => String(v.id)));
+        for (const id of selectedVoterIds) {
+          if (!currentIds.has(id)) selectedVoterIds.delete(id);
+        }
+
+        // Jalankan pengurutan data saat ini
+        sortVotersList();
+
+        // Tampilkan halaman pertama
+        renderVotersTable();
+
+      } catch(err) {
+        console.error('loadVoters error:', err);
+        tbody.innerHTML = '<tr><td colspan="8" class="text-muted text-center" style="padding:24px;">Terjadi kesalahan saat memuat data pemilih.</td></tr>';
+      }
+    }
+
+    // Fungsi Pengurutan Data (Sorting)
+    function sortVotersList() {
+      allVoters.sort((a, b) => {
+        let res = 0;
+        if (currentSortCol === 'name') {
+          res = (a.name || '').localeCompare(b.name || '', 'id', { sensitivity: 'base' });
+        } else if (currentSortCol === 'class') {
+          res = (a.class || '').localeCompare(b.class || '', 'id', { numeric: true });
+        } else if (currentSortCol === 'nisn') {
+          res = String(a.nisn || '').localeCompare(String(b.nisn || ''), undefined, { numeric: true });
+        } else if (currentSortCol === 'gender') {
+          res = (a.gender || '').localeCompare(b.gender || '', 'id');
+        } else if (currentSortCol === 'religion') {
+          res = (a.religion || '').localeCompare(b.religion || '', 'id');
+        } else if (currentSortCol === 'status') {
+          res = (a.has_voted ? 1 : 0) - (b.has_voted ? 1 : 0);
+        }
+        return currentSortDir === 'desc' ? -res : res;
+      });
+    }
+
+    function applySort(col, dir = null) {
+      if (dir) {
+        currentSortCol = col;
+        currentSortDir = dir;
+      } else {
+        if (currentSortCol === col) {
+          currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          currentSortCol = col;
+          currentSortDir = 'asc';
+        }
+      }
+
+      // Update header sort indicator icons
+      ['nisn', 'name', 'class', 'gender', 'religion', 'status'].forEach(c => {
+        const th = document.querySelector(`th.sortable[data-sort="${c}"]`);
+        const icon = $(`icon-sort-${c}`);
+        if (!th || !icon) return;
+
+        if (c === currentSortCol) {
+          th.classList.add('sort-active');
+          icon.textContent = currentSortDir === 'asc' ? '▲' : '▼';
+        } else {
+          th.classList.remove('sort-active');
+          icon.textContent = '↕';
+        }
+      });
+
+      // Sinkronisasi dropdown urutkan
+      const sortSelect = $('voter-sort-select');
+      if (sortSelect) {
+        const targetVal = `${currentSortCol}_${currentSortDir}`;
+        if (currentSortCol === 'status') {
+          sortSelect.value = currentSortDir === 'asc' ? 'status_notvoted' : 'status_voted';
+        } else if ([...sortSelect.options].some(opt => opt.value === targetVal)) {
+          sortSelect.value = targetVal;
+        }
+      }
+
+      votersPage = 0;
+      sortVotersList();
+      renderVotersTable();
+    }
+
+    // Render Baris Tabel DPT & Checkbox
+    function renderVotersTable() {
+      const tbody = $('voters-tbody');
+      if (!tbody) return;
+
+      if (allVoters.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-muted text-center" style="padding:24px;">Tidak ada data pemilih yang sesuai.</td></tr>';
+        $('voters-pagination-info').textContent = 'Tidak ada data';
+        $('btn-prev').disabled = true;
+        $('btn-next').disabled = true;
+        updateBulkActionBar();
+        return;
+      }
+
+      const totalPages = Math.ceil(allVoters.length / VOTERS_PER_PAGE);
+      if (votersPage >= totalPages) votersPage = Math.max(0, totalPages - 1);
+
+      const startIndex = votersPage * VOTERS_PER_PAGE;
+      const endIndex = Math.min(startIndex + VOTERS_PER_PAGE, allVoters.length);
+      const pageVoters = allVoters.slice(startIndex, endIndex);
+
+      tbody.innerHTML = '';
+      pageVoters.forEach(v => {
+        const tr = document.createElement('tr');
+        const vId = String(v.id);
+        const isChecked = selectedVoterIds.has(vId);
+        if (isChecked) tr.classList.add('selected-row');
+
+        const genderBadge = v.gender
+          ? `<span class="badge" style="background:rgba(0,48,73,0.08); color:var(--color-deep-space);">${escHtml(v.gender)}</span>`
+          : '<span class="text-muted">—</span>';
+        const religionBadge = v.religion
+          ? `<span style="font-weight:500;">${escHtml(v.religion)}</span>`
+          : '<span class="text-muted">—</span>';
+        const classBadge = v.class
+          ? `<span class="badge" style="background:rgba(102,155,188,0.20); color:var(--color-deep-space);">${escHtml(v.class)}</span>`
+          : '<span class="text-muted">—</span>';
+
+        tr.innerHTML = `
+          <td class="td-checkbox">
+            <input type="checkbox" class="voter-row-checkbox" data-id="${escHtml(vId)}" data-nisn="${escHtml(v.nisn)}" data-name="${escHtml(v.name)}" ${isChecked ? 'checked' : ''} aria-label="Pilih ${escHtml(v.name)}" />
+          </td>
+          <td class="font-numeric" style="font-weight:600; letter-spacing:0.02em;">${escHtml(v.nisn)}</td>
+          <td style="font-weight:500;">${escHtml(v.name)}</td>
+          <td>${classBadge}</td>
+          <td>${genderBadge}</td>
+          <td>${religionBadge}</td>
+          <td><span class="badge ${v.has_voted ? 'badge-voted' : 'badge-not-voted'}">${v.has_voted ? 'Sudah Memilih' : 'Belum Memilih'}</span></td>
+          <td style="text-align: center;">
+            <button type="button" class="btn btn-danger btn-sm btn-del-voter" data-id="${escHtml(vId)}" data-nisn="${escHtml(v.nisn)}" data-name="${escHtml(v.name)}" aria-label="Hapus pemilih ${escHtml(v.name)}">Hapus</button>
+          </td>
+        `;
+
+        // Event listener centang baris
+        const chk = tr.querySelector('.voter-row-checkbox');
+        chk.addEventListener('change', (e) => {
+          if (chk.checked) {
+            selectedVoterIds.add(vId);
+            tr.classList.add('selected-row');
+          } else {
+            selectedVoterIds.delete(vId);
+            tr.classList.remove('selected-row');
+          }
+          syncCheckAllState(pageVoters);
+          updateBulkActionBar();
+        });
+
+        tbody.appendChild(tr);
+      });
+
+      // Tombol hapus satuan
+      tbody.querySelectorAll('.btn-del-voter').forEach(btn => {
+        btn.addEventListener('click', () => {
+          deletingVoterId = btn.dataset.id;
+          $('del-voter-body').innerHTML = `Apakah Anda yakin ingin menghapus pemilih <strong>${escHtml(btn.dataset.name)}</strong> (NISN: ${escHtml(btn.dataset.nisn)})?`;
+          $('overlay-delete-voter').classList.remove('hidden');
+        });
+      });
+
+      // Status Check All di header
+      syncCheckAllState(pageVoters);
+
+      // Status Bulk Action Bar
+      updateBulkActionBar();
+
+      // Update Pagination UI
+      const startNum = startIndex + 1;
+      const endNum = endIndex;
+      $('voters-pagination-info').textContent = `${startNum}–${endNum} dari ${allVoters.length} pemilih`;
+      $('btn-prev').disabled = votersPage === 0;
+      $('btn-next').disabled = votersPage >= totalPages - 1;
+    }
+
+    // Sinkronisasi status Checkbox "Pilih Semua" di header
+    function syncCheckAllState(pageVoters) {
+      const checkAll = $('check-all-voters');
+      if (!checkAll || !pageVoters || pageVoters.length === 0) {
+        if (checkAll) { checkAll.checked = false; checkAll.indeterminate = false; }
+        return;
+      }
+
+      const pageIds = pageVoters.map(v => String(v.id));
+      const checkedCount = pageIds.filter(id => selectedVoterIds.has(id)).length;
+
+      if (checkedCount === 0) {
+        checkAll.checked = false;
+        checkAll.indeterminate = false;
+      } else if (checkedCount === pageIds.length) {
+        checkAll.checked = true;
+        checkAll.indeterminate = false;
+      } else {
+        checkAll.checked = false;
+        checkAll.indeterminate = true;
+      }
+    }
+
+    // Update Tampilan Bar Aksi Massal (Bulk Action Bar)
+    function updateBulkActionBar() {
+      const bar = $('bulk-action-bar');
+      const badge = $('bulk-count-badge');
+      const infoText = $('bulk-info-text');
+      if (!bar) return;
+
+      const count = selectedVoterIds.size;
+      if (count > 0) {
+        bar.classList.remove('hidden');
+        badge.textContent = count;
+        infoText.textContent = `${count} data pemilih dipilih`;
+      } else {
+        bar.classList.add('hidden');
+      }
+    }
+
+    // Checkbox Pilih Semua di Header
+    $('check-all-voters').addEventListener('change', (e) => {
+      const startIndex = votersPage * VOTERS_PER_PAGE;
+      const endIndex = Math.min(startIndex + VOTERS_PER_PAGE, allVoters.length);
+      const pageVoters = allVoters.slice(startIndex, endIndex);
+
+      if (e.target.checked) {
+        pageVoters.forEach(v => selectedVoterIds.add(String(v.id)));
+      } else {
+        pageVoters.forEach(v => selectedVoterIds.delete(String(v.id)));
+      }
+
+      renderVotersTable();
+    });
+
+    // Tombol Batal Pilihan Massal
+    $('btn-bulk-cancel').addEventListener('click', () => {
+      selectedVoterIds.clear();
+      renderVotersTable();
+    });
+
+    // Tombol Buka Dialog Hapus Massal
+    $('btn-bulk-delete-trigger').addEventListener('click', () => {
+      const count = selectedVoterIds.size;
+      if (count === 0) return;
+
+      $('bulk-del-body').innerHTML = `Apakah Anda yakin ingin menghapus <strong>${count} data pemilih</strong> yang dipilih?<br><span style="color:var(--color-brick-red); font-size:12px; margin-top:6px; display:inline-block;">Peringatan: Seluruh data pemilih ini akan dihapus permanen.</span>`;
+      $('overlay-bulk-delete').classList.remove('hidden');
+    });
+
+    // Batal Modal Hapus Massal
+    $('btn-bulk-del-cancel').addEventListener('click', () => {
+      $('overlay-bulk-delete').classList.add('hidden');
+    });
+
+    // Konfirmasi Eksekusi Hapus Massal
+    $('btn-bulk-del-confirm').addEventListener('click', async () => {
+      $('overlay-bulk-delete').classList.add('hidden');
+      const idsToDelete = Array.from(selectedVoterIds);
+      if (idsToDelete.length === 0) return;
+
+      const btn = $('btn-bulk-delete-trigger');
+      btn.disabled = true;
+
+      try {
+        if (!isValidUUID(adminToken)) await ensureAuth(true);
+
+        showToast(`Menghapus ${idsToDelete.length} data pemilih...`, 'info');
+
+        // Coba hapus via fungsi RPC bulk jika ada
+        let bulkResult = await rpc('admin_delete_voters_bulk', {
+          p_token: adminToken,
+          p_voter_ids: idsToDelete.map(Number)
+        });
+
+        // Fallback jika admin_delete_voters_bulk belum dibuat di DB: hapus batch paralel
+        if (!bulkResult || !bulkResult.ok) {
+          const deletePromises = idsToDelete.map(id => rpc('admin_delete_voter', {
+            p_token: adminToken,
+            p_voter_id: Number(id)
+          }));
+          await Promise.all(deletePromises);
+        }
+
+        showToast(`Berhasil menghapus ${idsToDelete.length} data pemilih.`, 'success');
+        selectedVoterIds.clear();
+        await loadVoters();
+        await loadKontrol();
+
+      } catch(err) {
+        console.error('Bulk delete error:', err);
+        showToast('Terjadi kesalahan saat menghapus data terpilih.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // Sorting via Header Kolom Tabel
+    document.querySelectorAll('th.sortable[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.sort;
+        applySort(col);
+      });
+    });
+
+    // Sorting via Dropdown Pilihan
+    const sortSelect = $('voter-sort-select');
+    if (sortSelect) {
+      sortSelect.addEventListener('change', () => {
+        const val = sortSelect.value;
+        if (val === 'status_notvoted') {
+          applySort('status', 'asc');
+        } else if (val === 'status_voted') {
+          applySort('status', 'desc');
+        } else {
+          const [col, dir] = val.split('_');
+          applySort(col, dir);
+        }
+      });
+    }
+
+    // Search
+    $('btn-search').addEventListener('click', () => {
+      votersSearch = $('voter-search').value.trim();
+      votersPage = 0;
+      loadVoters();
+    });
+    $('voter-search').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { $('btn-search').click(); }
+    });
+
+    // Pagination
+    $('btn-prev').addEventListener('click', () => {
+      if (votersPage > 0) {
+        votersPage--;
+        renderVotersTable();
+      }
+    });
+    $('btn-next').addEventListener('click', () => {
+      const totalPages = Math.ceil(allVoters.length / VOTERS_PER_PAGE);
+      if (votersPage < totalPages - 1) {
+        votersPage++;
+        renderVotersTable();
+      }
+    });
+
+    // ─── UNDUH TEMPLATE EXCEL ──────────────────────────────────────────────────
+    function downloadExcelTemplate() {
+      if (typeof XLSX === 'undefined') {
+        showToast('Pustaka Excel belum siap. Coba muat ulang halaman.', 'error');
+        return;
+      }
+      const sampleData = [
+        {
+          "nisn": "0081234561",
+          "nama": "Ahmad Rizky Pratama",
+          "kelas": "IX-A",
+          "jenis kelamin": "Laki-laki",
+          "agama": "Islam"
+        },
+        {
+          "nisn": "0081234562",
+          "nama": "Siti Nurhaliza Putri",
+          "kelas": "IX-B",
+          "jenis kelamin": "Perempuan",
+          "agama": "Islam"
+        },
+        {
+          "nisn": "0081234563",
+          "nama": "Daniel Alexander",
+          "kelas": "VIII-A",
+          "jenis kelamin": "Laki-laki",
+          "agama": "Kristen"
+        },
+        {
+          "nisn": "0081234564",
+          "nama": "Ni Wayan Putu Anggraini",
+          "kelas": "VII-C",
+          "jenis kelamin": "Perempuan",
+          "agama": "Hindu"
+        },
+        {
+          "nisn": "0081234565",
+          "nama": "Budi Santoso",
+          "kelas": "VII-A",
+          "jenis kelamin": "Laki-laki",
+          "agama": "Katolik"
+        }
+      ];
+
+      const ws = XLSX.utils.json_to_sheet(sampleData, {
+        header: ["nisn", "nama", "kelas", "jenis kelamin", "agama"]
+      });
+      ws['!cols'] = [
+        { wch: 16 }, // nisn
+        { wch: 28 }, // nama
+        { wch: 12 }, // kelas
+        { wch: 16 }, // jenis kelamin
+        { wch: 14 }  // agama
+      ];
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "DPT_Pemilih");
+      XLSX.writeFile(wb, "template_dpt_pemilih_osis.xlsx");
+      showToast("Format contoh template_dpt_pemilih_osis.xlsx berhasil diunduh.", "success");
+    }
+
+    $('btn-download-template').addEventListener('click', downloadExcelTemplate);
+
+    // ─── FILE UPLOAD & PARSER (EXCEL & CSV) ───────────────────────────────────
+    let stagedVoters = [];
+
+    const uploadDropzone = $('upload-dropzone');
+    const fileInput = $('voter-file-input');
+    const browseTrigger = $('btn-browse-trigger');
+    const fileSelectedCard = $('file-selected-card');
+    const fileNameLabel = $('file-name-label');
+    const fileDetailSub = $('file-detail-sub');
+    const btnCancelFile = $('btn-cancel-file');
+    const btnDoImport = $('btn-do-import');
+    const importStatus = $('import-status');
+
+    browseTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
+
+    uploadDropzone.addEventListener('click', (e) => {
+      if (e.target !== browseTrigger) {
+        fileInput.click();
+      }
+    });
+
+    uploadDropzone.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        fileInput.click();
+      }
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      uploadDropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadDropzone.classList.add('drag-over');
+      });
+    });
+
+    ['dragleave', 'dragend'].forEach(eventName => {
+      uploadDropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadDropzone.classList.remove('drag-over');
+      });
+    });
+
+    uploadDropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadDropzone.classList.remove('drag-over');
+      const file = e.dataTransfer?.files?.[0];
+      if (file) handleVoterFile(file);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (file) handleVoterFile(file);
+    });
+
+    function resetStagedFile() {
+      stagedVoters = [];
+      fileInput.value = '';
+      fileSelectedCard.classList.remove('active');
+      const prevWrap = $('file-preview-wrap');
+      if (prevWrap) prevWrap.style.display = 'none';
+      const prevBody = $('file-preview-tbody');
+      if (prevBody) prevBody.innerHTML = '';
+      importStatus.textContent = '';
+    }
+
+    async function handleVoterFile(file) {
+      importStatus.textContent = 'Membaca berkas...';
+      importStatus.style.color = 'var(--color-steel-blue)';
+
+      try {
+        const fileName = file.name.toLowerCase();
+        let rawRows = [];
+
+        if (fileName.endsWith('.csv')) {
+          const text = await file.text();
+          const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+          rawRows = parsed.data || [];
+        } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+          if (typeof XLSX === 'undefined') {
+            throw new Error('Pustaka Excel belum siap dimuat.');
+          }
+          const buffer = await file.arrayBuffer();
+          const wb = XLSX.read(buffer, { type: 'array' });
+          const firstSheet = wb.Sheets[wb.SheetNames[0]];
+          rawRows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+        } else {
+          const buffer = await file.arrayBuffer();
+          const wb = XLSX.read(buffer, { type: 'array' });
+          const firstSheet = wb.Sheets[wb.SheetNames[0]];
+          rawRows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+        }
+
+        if (!rawRows || rawRows.length === 0) {
+          importStatus.innerHTML = '<span style="color:var(--color-brick-red);">Berkas kosong atau tidak ada data yang terbaca.</span>';
+          showToast('Berkas kosong.', 'error');
+          resetStagedFile();
+          return;
+        }
+
+        // Deteksi dan normalisasi header secara cerdas
+        const sampleRow = rawRows[0];
+        const keys = Object.keys(sampleRow);
+
+        const findKey = (patterns) => keys.find(k => {
+          const cleanKey = k.trim().toLowerCase();
+          return patterns.some(p => cleanKey === p || cleanKey.includes(p));
+        });
+
+        // 1. Kolom NISN
+        const keyNisn = findKey(['nisn', 'nomor induk', 'no_nisn', 'no nisn']) || keys[0];
+
+        // 2. Kolom Nama
+        const keyNama = findKey(['nama', 'name', 'siswa', 'lengkap', 'peserta']) || (keys.length > 1 ? keys[1] : null);
+
+        // 3. Kolom Kelas
+        const keyKelas = findKey(['kelas', 'class', 'rombel', 'tingkat']) || (keys.length > 2 ? keys[2] : null);
+
+        // 4. Kolom Jenis Kelamin (tangani 'jenis keLaki-la', 'jenis kelamin', 'jk', 'gender', 'laki', 'perempuan', dll)
+        let keyJk = findKey(['jenis', 'kelamin', 'gender', 'jk', 'sex', 'l/p', 'lp', 'laki', 'perempuan']);
+        if (!keyJk && keys.length > 3) {
+          keyJk = keys[3]; // Fallback posisi kolom ke-4
+        }
+
+        // 5. Kolom Agama
+        let keyAgama = findKey(['agama', 'religion', 'keyakinan', 'kepercayaan']);
+        if (!keyAgama && keys.length > 4) {
+          keyAgama = keys[4]; // Fallback posisi kolom ke-5
+        }
+
+        if (!keyNisn || !keyNama) {
+          importStatus.innerHTML = `
+            <span style="color:var(--color-brick-red);">
+              Format kolom berkas tidak sesuai.<br />
+              Kolom terdeteksi: <code>${keys.join(', ')}</code>.<br />
+              Wajib menyertakan kolom: <code>nisn</code> dan <code>nama</code> (beserta <code>kelas</code>, <code>jenis kelamin</code>, <code>agama</code>).
+            </span>`;
+          showToast('Format kolom tidak valid. Periksa baris judul.', 'error');
+          resetStagedFile();
+          return;
+        }
+
+        stagedVoters = rawRows.map(r => {
+          let nisnVal = String(r[keyNisn] ?? '').trim();
+          // Antisipasi jika Excel menyimpan angka besar dalam notasi eksponensial
+          if (nisnVal.includes('e+') || nisnVal.includes('E+')) {
+            nisnVal = Number(nisnVal).toFixed(0);
+          }
+
+          let nameVal = String(r[keyNama] ?? '').trim();
+          let classVal = keyKelas ? String(r[keyKelas] ?? '').trim() : '';
+
+          let genderVal = keyJk ? String(r[keyJk] ?? '').trim() : '';
+          // Normalisasi teks jenis kelamin
+          if (/^l(aki)?(-laki)?$/i.test(genderVal)) genderVal = 'Laki-laki';
+          else if (/^p(erempuan)?$/i.test(genderVal)) genderVal = 'Perempuan';
+
+          let religionVal = keyAgama ? String(r[keyAgama] ?? '').trim() : '';
+          if (religionVal) {
+            religionVal = religionVal.charAt(0).toUpperCase() + religionVal.slice(1);
+          }
+
+          return {
+            nisn: nisnVal,
+            name: nameVal,
+            class: classVal,
+            gender: genderVal,
+            religion: religionVal,
+          };
+        }).filter(v => v.nisn && v.name);
+
+        if (stagedVoters.length === 0) {
+          importStatus.innerHTML = '<span style="color:var(--color-brick-red);">Tidak ditemukan data pemilih yang memiliki NISN dan Nama lengkap.</span>';
+          showToast('Data pemilih tidak ditemukan.', 'error');
+          resetStagedFile();
+          return;
+        }
+
+        fileNameLabel.textContent = file.name;
+        const fileSizeKb = (file.size / 1024).toFixed(1);
+        fileDetailSub.textContent = `${fileSizeKb} KB • ${stagedVoters.length} siswa siap diimpor`;
+        fileSelectedCard.classList.add('active');
+
+        // Tampilkan Pratinjau 3 Baris Pertama
+        const previewWrap = $('file-preview-wrap');
+        const previewTbody = $('file-preview-tbody');
+        if (previewWrap && previewTbody) {
+          previewTbody.innerHTML = '';
+          const previewRows = stagedVoters.slice(0, 3);
+          previewRows.forEach(pv => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td style="padding: 6px 10px; font-weight: 600;">${escHtml(pv.nisn)}</td>
+              <td style="padding: 6px 10px;">${escHtml(pv.name)}</td>
+              <td style="padding: 6px 10px;">${escHtml(pv.class || '—')}</td>
+              <td style="padding: 6px 10px;">${escHtml(pv.gender || '—')}</td>
+              <td style="padding: 6px 10px;">${escHtml(pv.religion || '—')}</td>
+            `;
+            previewTbody.appendChild(tr);
+          });
+          previewWrap.style.display = 'block';
+        }
+
+        importStatus.innerHTML = `
+          <span style="color:var(--color-success-text); font-weight:500;">
+            ✓ Berkas berhasil dibaca: <strong>${stagedVoters.length} data pemilih</strong> terdeteksi lengkap (NISN, Nama, Kelas, Jenis Kelamin, Agama). Silakan klik tombol <strong>"Mulai Impor Data"</strong> untuk menyimpan ke database.
+          </span>`;
+
+      } catch(err) {
+        console.error('File parsing error:', err);
+        importStatus.innerHTML = `<span style="color:var(--color-brick-red);">Gagal membaca berkas: ${escHtml(err.message)}</span>`;
+        showToast('Gagal memproses berkas.', 'error');
+        resetStagedFile();
+      }
+    }
+
+    // Eksekusi Impor ke Supabase
+    btnDoImport.addEventListener('click', async () => {
+      if (!stagedVoters || stagedVoters.length === 0) {
+        showToast('Pilih berkas Excel/CSV terlebih dahulu.', 'error');
+        return;
+      }
+
+      btnDoImport.disabled = true;
+      btnDoImport.textContent = 'Mengimpor...';
+      importStatus.innerHTML = '<span style="color:var(--color-steel-blue);">Menyimpan data pemilih ke basis data...</span>';
+
+      try {
+        const result = await rpc('admin_import_voters', {
+          p_token: adminToken,
+          p_voters: JSON.stringify(stagedVoters),
+        });
+
+        if (!result || !result.ok) {
+          importStatus.innerHTML = `<span style="color:var(--color-brick-red);">Gagal mengimpor: ${escHtml(result?.error || 'Kesalahan sistem.')}</span>`;
+          showToast(result?.error || 'Gagal mengimpor pemilih.', 'error');
+        } else {
+          const importedCount = result.data?.imported ?? stagedVoters.length;
+          showToast(`Berhasil mengimpor ${importedCount} pemilih!`, 'success');
+          importStatus.innerHTML = `
+            <span style="color:var(--color-success-text); font-weight:600;">
+              ✓ Sukses! Sebanyak ${importedCount} data pemilih berhasil diimpor ke dalam Daftar Pemilih Tetap (DPT).
+            </span>`;
+          
+          votersPage = 0;
+          await loadVoters();
+          // Update data kontrol juga
+          await loadKontrol();
+          resetStagedFile();
+        }
+      } catch(err) {
+        importStatus.innerHTML = '<span style="color:var(--color-brick-red);">Gagal terhubung ke server database.</span>';
+        showToast('Gagal terhubung ke server.', 'error');
+      } finally {
+        btnDoImport.disabled = false;
+        btnDoImport.textContent = 'Mulai Impor Data';
+      }
+    });
+
+    // Hapus Pemilih
+    $('btn-del-voter-cancel').addEventListener('click', () => {
+      $('overlay-delete-voter').classList.add('hidden');
+      deletingVoterId = null;
+    });
+    $('btn-del-voter-confirm').addEventListener('click', async () => {
+      $('overlay-delete-voter').classList.add('hidden');
+      const btn = $('btn-del-voter-confirm');
+      btn.disabled = true;
+      try {
+        const result = await rpc('admin_delete_voter', { p_token: adminToken, p_voter_id: deletingVoterId });
+        if (!result || !result.ok) { showToast(result?.error || 'Gagal menghapus.', 'error'); return; }
+        showToast('Pemilih berhasil dihapus.', 'success');
+        await loadVoters();
+      } catch(err) {
+        showToast('Gagal terhubung ke server.', 'error');
+      } finally {
+        btn.disabled = false;
+        deletingVoterId = null;
+      }
+    });
+
+    // ─── TAB LAPORAN & CETAK (EKSPOR HASIL PEMILIHAN) ──────────────────────────
+    let cachedAnalyticsData = null;
+    let cachedConfigData = null;
+
+    // Helper Angka ke Terbilang Bahasa Indonesia untuk Dokumen Berita Acara
+    function angkaKeTerbilang(n) {
+      n = Math.abs(parseInt(n, 10)) || 0;
+      if (n === 0) return 'Nol';
+      const satuan = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh', 'Sebelas'];
+      if (n < 12) return satuan[n];
+      if (n < 20) return angkaKeTerbilang(n - 10) + ' Belas';
+      if (n < 100) return angkaKeTerbilang(Math.floor(n / 10)) + ' Puluh' + (n % 10 !== 0 ? ' ' + satuan[n % 10] : '');
+      if (n < 200) return 'Seratus' + (n % 100 !== 0 ? ' ' + angkaKeTerbilang(n % 100) : '');
+      if (n < 1000) return angkaKeTerbilang(Math.floor(n / 100)) + ' Ratus' + (n % 100 !== 0 ? ' ' + angkaKeTerbilang(n % 100) : '');
+      if (n < 2000) return 'Seribu' + (n % 1000 !== 0 ? ' ' + angkaKeTerbilang(n % 1000) : '');
+      if (n < 1000000) return angkaKeTerbilang(Math.floor(n / 1000)) + ' Ribu' + (n % 1000 !== 0 ? ' ' + angkaKeTerbilang(n % 1000) : '');
+      return String(n);
+    }
+
+    // Ambil Data Analitik untuk Laporan
+    async function fetchAnalyticsData() {
+      if (!adminToken || !isValidUUID(adminToken)) await ensureAuth(true);
+      try {
+        let res = await rpc('admin_analytics', { p_token: adminToken });
+        if (!res || !res.ok) {
+          const authOk = await ensureAuth(true);
+          if (authOk) {
+            res = await rpc('admin_analytics', { p_token: adminToken });
+          }
+        }
+        if (res && res.ok && res.data) {
+          return res.data;
+        }
+      } catch (e) {
+        console.error('fetchAnalyticsData error:', e);
+      }
+      return null;
+    }
+
+    // Muat Tab Laporan
+    async function loadLaporan() {
+      const docEl = $('berita-acara-doc');
+      if (docEl) {
+        docEl.innerHTML = '<div style="text-align:center; padding: 48px; color: rgba(0,48,73,0.65);"><p style="font-weight:600; margin-bottom:6px;">Mengambil data pemilihan terbaru...</p><p style="font-size:12px;">Menyusun rekapitulasi perolehan suara dan dokumen Berita Acara.</p></div>';
+      }
+
+      try {
+        const [analyticsData, configRes] = await Promise.all([
+          fetchAnalyticsData(),
+          rpc('admin_get_config', { p_token: adminToken }).catch(() => null)
+        ]);
+
+        cachedAnalyticsData = analyticsData;
+        if (configRes && configRes.ok) {
+          cachedConfigData = configRes.data;
+          electionIsOpen = configRes.data?.is_open ?? electionIsOpen;
+        }
+
+        if (!cachedAnalyticsData) {
+          if (docEl) {
+            docEl.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--color-brick-red);"><p style="font-weight:700;">Gagal memuat data pemilihan.</p><p style="font-size:12px; color:rgba(0,48,73,0.7); margin-top:6px;">Pastikan koneksi database aktif lalu klik "Segarkan Data".</p></div>';
+          }
+          showToast('Gagal memuat data laporan.', 'error');
+          return;
+        }
+
+        renderBeritaAcaraDocument();
+      } catch (err) {
+        console.error('loadLaporan error:', err);
+        if (docEl) {
+          docEl.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--color-brick-red);">Terjadi kesalahan saat memproses dokumen laporan.</div>';
+        }
+        showToast('Terjadi kesalahan memuat laporan.', 'error');
+      }
+    }
+
+    // Render Dokumen Resmi Berita Acara
+    function renderBeritaAcaraDocument() {
+      const docEl = $('berita-acara-doc');
+      if (!docEl) return;
+
+      const data = cachedAnalyticsData || {
+        total_voters: 0,
+        total_votes: 0,
+        candidates_votes: [],
+        participation_by_class: [],
+        participation_by_gender: []
+      };
+
+      const totalVoters = data.total_voters || 0;
+      const totalVotes = data.total_votes || 0;
+      const notVoted = Math.max(0, totalVoters - totalVotes);
+      const partPct = totalVoters > 0 ? ((totalVotes / totalVoters) * 100).toFixed(1) : '0.0';
+      const notVotedPct = totalVoters > 0 ? ((notVoted / totalVoters) * 100).toFixed(1) : '0.0';
+
+      // Ambil nilai konfigurasi pejabat dari form (atau gunakan default)
+      const docNomor = $('cfg-doc-nomor')?.value.trim() || '421.3 / 085 / OSIS-SMPN13 / X / 2026';
+      const docLokasi = $('cfg-doc-lokasi')?.value.trim() || 'UPTD SMP Negeri 13 Penajam Paser Utara';
+      const docKepsek = $('cfg-doc-kepsek')?.value.trim() || 'Drs. H. M. Syahrir, M.Pd.';
+      const docNipKepsek = $('cfg-doc-nip-kepsek')?.value.trim() || '19680512 199412 1 002';
+      const docPembina = $('cfg-doc-pembina')?.value.trim() || 'Bambang Sutejo, S.Pd.';
+      const docNipPembina = $('cfg-doc-nip-pembina')?.value.trim() || 'NIP. 19820315 200801 1 011';
+      const docPanitia = $('cfg-doc-panitia')?.value.trim() || 'Aura Kasih Ramadhani (Ketua Panitia Pemilihan)';
+
+      // Tanggal Bahasa Indonesia
+      const sekarang = new Date();
+      const hariArr = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const bulanArr = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const namaHari = hariArr[sekarang.getDay()];
+      const tglAngka = sekarang.getDate();
+      const namaBulan = bulanArr[sekarang.getMonth()];
+      const tahunAngka = sekarang.getFullYear();
+      const tglFormatLengkap = `${namaHari}, tanggal ${angkaKeTerbilang(tglAngka)} bulan ${namaBulan} tahun ${angkaKeTerbilang(tahunAngka)} (${tglAngka} ${namaBulan} ${tahunAngka})`;
+      const tglSingkat = `${tglAngka} ${namaBulan} ${tahunAngka}`;
+
+      // Urutkan paslon berdasarkan perolehan suara terbanyak untuk menentukan pemenang
+      const candidates = [...(data.candidates_votes || [])];
+      const sortedByVotes = [...candidates].sort((a, b) => (b.vote_count || 0) - (a.vote_count || 0));
+      const winner = sortedByVotes.length > 0 && totalVotes > 0 ? sortedByVotes[0] : null;
+
+      // Status pemilihan
+      const isClosed = !electionIsOpen;
+      const statusTitle = isClosed ? 'HASIL AKHIR' : 'HASIL SEMENTARA';
+      const statusKet = isClosed ? 'Selesai &amp; Ditetapkan' : 'Sedang Berlangsung';
+
+      // Baris Tabel Perolehan Paslon
+      let candTableRows = '';
+      if (candidates.length === 0) {
+        candTableRows = '<tr><td colspan="7" style="text-align:center; padding:12px; font-style:italic;">Belum ada pasangan calon yang terdaftar dalam sistem.</td></tr>';
+      } else {
+        candidates.forEach(c => {
+          const vCount = c.vote_count || 0;
+          const pct = totalVotes > 0 ? ((vCount / totalVotes) * 100).toFixed(1) : '0.0';
+          const isHighest = winner && winner.id === c.id && vCount > 0;
+          const chairmanName = c.chairman || (c.name ? c.name.split('&')[0].trim() : '—');
+          const viceName = c.vice_chairman || (c.name && c.name.includes('&') ? c.name.split('&')[1].trim() : '—');
+
+          candTableRows += `
+            <tr class="${isHighest ? 'highlight-winner' : ''}">
+              <td style="text-align:center; font-weight:700; font-size:13px;">${escHtml(c.number)}</td>
+              <td>
+                <div style="font-weight:700; font-size:13px; color:#000;">PASLON ${escHtml(c.number)}</div>
+                <div style="font-size:12px; margin-top:2px;">
+                  <div><strong>Ketua:</strong> ${escHtml(chairmanName)}</div>
+                  <div><strong>Wakil:</strong> ${escHtml(viceName)}</div>
+                </div>
+              </td>
+              <td style="text-align:center; font-weight:700; font-size:13px;">${vCount.toLocaleString('id-ID')}</td>
+              <td style="font-size:11.5px; font-style:italic;">${angkaKeTerbilang(vCount)} Suara</td>
+              <td style="text-align:center; font-weight:700;">${pct}%</td>
+              <td style="text-align:center; font-size:11.5px;">
+                ${isHighest ? (isClosed ? '<span style="font-weight:700; color:#1e6b3a;">★ TERPILIH</span>' : '<span style="font-weight:700; color:#003049;">Unggul Sementara</span>') : '—'}
+              </td>
+            </tr>
+          `;
+        });
+      }
+
+      // Baris Tabel Partisipasi per Kelas
+      let classTableRows = '';
+      const classList = data.participation_by_class || [];
+      if (classList.length === 0) {
+        classTableRows = '<tr><td colspan="6" style="text-align:center; padding:8px; font-style:italic;">Data kelas belum tersedia.</td></tr>';
+      } else {
+        classList.forEach((k, i) => {
+          const kTotal = k.total || 0;
+          const kVoted = k.voted || 0;
+          const kNotVoted = k.not_voted || 0;
+          const kPct = kTotal > 0 ? ((kVoted / kTotal) * 100).toFixed(1) : '0.0';
+          classTableRows += `
+            <tr>
+              <td style="text-align:center;">${i + 1}</td>
+              <td style="font-weight:600; text-align:center;">${escHtml(k.class_name || '—')}</td>
+              <td style="text-align:center;">${kTotal}</td>
+              <td style="text-align:center; font-weight:600;">${kVoted}</td>
+              <td style="text-align:center;">${kNotVoted}</td>
+              <td style="text-align:center;">${kPct}%</td>
+            </tr>
+          `;
+        });
+      }
+
+      // Baris Saksi Paslon untuk Lembar Tanda Tangan
+      let saksiSignatures = '';
+      if (candidates.length > 0) {
+        const saksiCols = candidates.map(c => `
+          <div class="doc-sig-box">
+            <div class="doc-sig-role">Saksi Paslon Nomor ${escHtml(c.number)}</div>
+            <div class="doc-sig-space"></div>
+            <div class="doc-sig-name">( ............................................ )</div>
+            <div class="doc-sig-nip">Utusan Paslon ${escHtml(c.number)}</div>
+          </div>
+        `).join('');
+        saksiSignatures = `
+          <div style="margin-top: 18px; margin-bottom: 22px;">
+            <div style="font-size: 12px; font-weight:700; text-transform:uppercase; margin-bottom:12px; text-align:center; border-bottom: 1px dashed #999; padding-bottom: 4px;">
+              SAKSI-SAKSI PASANGAN CALON
+            </div>
+            <div class="doc-saksi-grid" style="grid-template-columns: repeat(${Math.min(candidates.length, 4)}, 1fr);">
+              ${saksiCols}
+            </div>
+          </div>
+        `;
+      }
+
+      // Kotak Pemenang / Calon Terpilih
+      let winnerBoxHtml = '';
+      if (winner && totalVotes > 0) {
+        const winChairman = winner.chairman || (winner.name ? winner.name.split('&')[0].trim() : '—');
+        const winVice = winner.vice_chairman || (winner.name && winner.name.includes('&') ? winner.name.split('&')[1].trim() : '—');
+        const winPct = ((winner.vote_count / totalVotes) * 100).toFixed(1);
+
+        winnerBoxHtml = `
+          <div class="doc-winner-box page-break-avoid">
+            <div class="doc-winner-title">
+              ${isClosed ? '★ PASANGAN CALON TERPILIH KETUA & WAKIL KETUA OSIS ★' : '★ PASANGAN CALON DENGAN PEROLEHAN SUARA TERBANYAK (SEMENTARA) ★'}
+            </div>
+            <div class="doc-winner-name">
+              PASANGAN CALON NOMOR URUT ${escHtml(winner.number)}
+            </div>
+            <div style="font-size: 14.5px; font-weight:700; margin: 4px 0;">
+              ${escHtml(winChairman)} &amp; ${escHtml(winVice)}
+            </div>
+            <div class="doc-winner-sub">
+              Memperoleh <strong>${winner.vote_count.toLocaleString('id-ID')} Suara</strong> (${winPct}% dari total suara masuk)
+            </div>
+          </div>
+        `;
+      }
+
+      // Bangun Dokumen Lengkap
+      docEl.innerHTML = `
+        <!-- KOP SURAT RESMI KEDINASAN -->
+        <div class="doc-kop">
+          <div class="doc-kop-logo" aria-hidden="true">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="46" stroke="#003049" stroke-width="3" fill="#faf8f5"/>
+              <circle cx="50" cy="50" r="40" stroke="#c1121f" stroke-width="1.5" stroke-dasharray="3 3"/>
+              <!-- Bintang & Buku Pendidikan Simbolis -->
+              <path d="M50 20 L53 28 L61 29 L55 35 L57 43 L50 39 L43 43 L45 35 L39 29 L47 28 Z" fill="#003049"/>
+              <path d="M26 62 Q50 54 74 62 L70 76 Q50 68 30 76 Z" fill="#003049"/>
+              <path d="M50 56 L50 78" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="50" cy="50" r="6" fill="#c1121f"/>
+            </svg>
+          </div>
+          <div class="doc-kop-text">
+            <h5>Pemerintah Kabupaten Penajam Paser Utara</h5>
+            <h4>Dinas Pendidikan Pemuda dan Olahraga</h4>
+            <h3>UPTD SMP NEGERI 13 PENAJAM PASER UTARA</h3>
+            <h5>ORGANISASI SISWA INTRA SEKOLAH (OSIS)</h5>
+            <p>Alamat: Jl. Propinsi KM. 13, Kelurahan Petung, Kec. Penajam, Kab. Penajam Paser Utara, Kaltim 76143</p>
+          </div>
+        </div>
+
+        <!-- JUDUL BERITA ACARA -->
+        <div class="doc-title-block">
+          <h2>BERITA ACARA REKAPITULASI HASIL PEMILIHAN</h2>
+          <h2>KETUA DAN WAKIL KETUA OSIS MASA BAKTI 2024/2025</h2>
+          <p>Nomor: ${escHtml(docNomor)}</p>
+        </div>
+
+        <!-- NARASI PEMBUKA -->
+        <div class="doc-narrative">
+          Pada hari ini <strong>${tglFormatLengkap}</strong>, bertempat di <strong>${escHtml(docLokasi)}</strong>, telah diselenggarakan proses pemungutan dan penghitungan suara dalam rangka <strong>Pemilihan Ketua dan Wakil Ketua OSIS Periode 2024/2025</strong> secara elektronik (E-Voting) yang berlangsung secara langsung, umum, bebas, rahasia, jujur, dan adil.
+        </div>
+        <div class="doc-narrative">
+          Berdasarkan hasil rekapitulasi data pemilihan yang terekam dalam sistem E-Voting Pemilihan OSIS, panitia pemilihan mengesahkan perolehan suara sebagai berikut:
+        </div>
+
+        <!-- BAGIAN I: DATA PEMILIH & PENGGUNA HAK PILIH -->
+        <div class="doc-section-heading">I. DATA PEMILIH DAN PENGGUNA HAK PILIH (DPT)</div>
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;">No</th>
+              <th>Uraian Rekapitulasi Pemilih</th>
+              <th style="width: 140px;">Jumlah Siswa</th>
+              <th style="width: 120px;">Persentase</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align:center;">1</td>
+              <td>Jumlah Pemilih Terdaftar dalam Daftar Pemilih Tetap (DPT)</td>
+              <td style="text-align:center; font-weight:700;">${totalVoters.toLocaleString('id-ID')}</td>
+              <td style="text-align:center; font-weight:700;">100.0%</td>
+            </tr>
+            <tr>
+              <td style="text-align:center;">2</td>
+              <td>Pengguna Hak Pilih (Suara Sah Masuk ke Sistem)</td>
+              <td style="text-align:center; font-weight:700; color:#1e6b3a;">${totalVotes.toLocaleString('id-ID')}</td>
+              <td style="text-align:center; font-weight:700; color:#1e6b3a;">${partPct}%</td>
+            </tr>
+            <tr>
+              <td style="text-align:center;">3</td>
+              <td>Pemilih yang Tidak Menggunakan Hak Pilih (Belum Memilih / Golput)</td>
+              <td style="text-align:center; font-weight:700; color:#780000;">${notVoted.toLocaleString('id-ID')}</td>
+              <td style="text-align:center; font-weight:700; color:#780000;">${notVotedPct}%</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- BAGIAN II: PEROLEHAN SUARA PASANGAN CALON -->
+        <div class="doc-section-heading">II. PEROLEHAN SUARA PASANGAN CALON KETUA &amp; WAKIL KETUA OSIS</div>
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th style="width: 44px;">No. Urut</th>
+              <th>Pasangan Calon (Ketua &amp; Wakil)</th>
+              <th style="width: 100px;">Suara Angka</th>
+              <th>Suara Terbilang</th>
+              <th style="width: 90px;">Persentase</th>
+              <th style="width: 130px;">Keterangan</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${candTableRows}
+          </tbody>
+        </table>
+
+        <!-- BAGIAN III: KOTAK PENETAPAN CALON TERPILIH -->
+        ${winnerBoxHtml}
+
+        <!-- BAGIAN IV: REKAPITULASI PARTISIPASI PER KELAS -->
+        <div class="doc-section-heading page-break-avoid">III. REKAPITULASI PARTISIPASI PEMILIH PER KELAS</div>
+        <table class="doc-table page-break-avoid">
+          <thead>
+            <tr>
+              <th style="width: 36px;">No</th>
+              <th style="width: 100px;">Kelas</th>
+              <th>Jumlah DPT</th>
+              <th>Sudah Memilih</th>
+              <th>Belum Memilih</th>
+              <th>Partisipasi (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${classTableRows}
+          </tbody>
+        </table>
+
+        <!-- KETERANGAN PENUTUP -->
+        <div class="doc-narrative page-break-avoid" style="margin-top: 14px;">
+          Demikian Berita Acara Rekapitulasi Hasil Pemilihan Ketua dan Wakil Ketua OSIS ini dibuat dengan sebenar-benarnya dalam rangkap secukupnya untuk dipergunakan sebagaimana mestinya dan menjadi dasar penetapan Pengurus OSIS Masa Bakti 2024/2025.
+        </div>
+
+        <!-- BAGIAN V: PENGESAHAN & TANDA TANGAN -->
+        <div class="doc-signatures page-break-avoid">
+          <div class="doc-sig-date">
+            Ditetapkan di: Penajam Paser Utara<br>
+            Pada tanggal: ${tglSingkat}
+          </div>
+
+          <!-- Saksi Paslon -->
+          ${saksiSignatures}
+
+          <!-- Panitia & Pembina OSIS -->
+          <div class="doc-sig-grid">
+            <div class="doc-sig-box">
+              <div class="doc-sig-role">Ketua Panitia Pemilihan OSIS,</div>
+              <div class="doc-sig-space"></div>
+              <div class="doc-sig-name">${escHtml(docPanitia)}</div>
+              <div class="doc-sig-nip">NISN Siswa / Panitia</div>
+            </div>
+            <div class="doc-sig-box">
+              <div class="doc-sig-role">Pembina OSIS SMPN 13 PPU,</div>
+              <div class="doc-sig-space"></div>
+              <div class="doc-sig-name">${escHtml(docPembina)}</div>
+              <div class="doc-sig-nip">${escHtml(docNipPembina)}</div>
+            </div>
+          </div>
+
+          <!-- Kepala Sekolah Mengetahui -->
+          <div style="display: flex; justify-content: center; margin-top: 14px;">
+            <div class="doc-sig-box" style="min-width: 280px;">
+              <div class="doc-sig-role">
+                Mengetahui,<br>
+                Kepala UPTD SMP Negeri 13 Penajam Paser Utara
+              </div>
+              <div class="doc-sig-space"></div>
+              <div class="doc-sig-name">${escHtml(docKepsek)}</div>
+              <div class="doc-sig-nip">NIP. ${escHtml(docNipKepsek)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Ekspor Excel Rekapitulasi Suara
+    async function exportRekapExcel() {
+      if (typeof XLSX === 'undefined') {
+        showToast('Pustaka Excel belum siap. Silakan muat ulang halaman.', 'error');
+        return;
+      }
+      showToast('Menyiapkan berkas Excel rekapitulasi...', 'info');
+
+      const data = cachedAnalyticsData || await fetchAnalyticsData();
+      if (!data) {
+        showToast('Gagal mengambil data untuk ekspor.', 'error');
+        return;
+      }
+
+      try {
+        const wb = XLSX.utils.book_new();
+        const totalVotes = data.total_votes || 0;
+        const totalVoters = data.total_voters || 0;
+        const partPct = totalVoters > 0 ? ((totalVotes / totalVoters) * 100).toFixed(1) : '0.0';
+
+        // Sheet 1: Hasil Pemilihan
+        const candRows = (data.candidates_votes || []).map(c => {
+          const vCount = c.vote_count || 0;
+          const pct = totalVotes > 0 ? ((vCount / totalVotes) * 100).toFixed(1) + '%' : '0.0%';
+          const chairman = c.chairman || (c.name ? c.name.split('&')[0].trim() : '—');
+          const vice = c.vice_chairman || (c.name && c.name.includes('&') ? c.name.split('&')[1].trim() : '—');
+          return [
+            c.number,
+            c.name,
+            chairman,
+            vice,
+            vCount,
+            angkaKeTerbilang(vCount) + ' Suara',
+            pct
+          ];
+        });
+
+        const wsHasilData = [
+          ["BERITA ACARA REKAPITULASI HASIL PEMILIHAN KETUA & WAKIL KETUA OSIS"],
+          ["UPTD SMP NEGERI 13 PENAJAM PASER UTARA"],
+          [`Tanggal Ekspor: ${new Date().toLocaleString('id-ID')}`],
+          [`Total Pemilih Terdaftar (DPT): ${totalVoters} Siswa`],
+          [`Total Suara Masuk (Partisipasi): ${totalVotes} Suara (${partPct}%)`],
+          [`Tidak Menggunakan Hak Pilih: ${Math.max(0, totalVoters - totalVotes)} Siswa`],
+          [],
+          ["Nomor Urut", "Nama Paslon", "Calon Ketua", "Calon Wakil", "Perolehan Suara", "Terbilang", "Persentase (%)"],
+          ...candRows
+        ];
+        const wsHasil = XLSX.utils.aoa_to_sheet(wsHasilData);
+        wsHasil['!cols'] = [{ wch: 12 }, { wch: 25 }, { wch: 22 }, { wch: 22 }, { wch: 16 }, { wch: 26 }, { wch: 15 }];
+        XLSX.utils.book_append_sheet(wb, wsHasil, "Hasil_Pemilihan");
+
+        // Sheet 2: Partisipasi Kelas
+        const classRows = (data.participation_by_class || []).map((k, idx) => {
+          const pct = k.total > 0 ? ((k.voted / k.total) * 100).toFixed(1) + '%' : '0.0%';
+          return [idx + 1, k.class_name || '—', k.total, k.voted, k.not_voted, pct];
+        });
+        const wsKelasData = [
+          ["DATA PARTISIPASI PEMILIH PER KELAS"],
+          ["UPTD SMP NEGERI 13 PENAJAM PASER UTARA"],
+          [`Tanggal Ekspor: ${new Date().toLocaleString('id-ID')}`],
+          [],
+          ["No", "Kelas", "Total Siswa (DPT)", "Sudah Memilih", "Belum Memilih", "Persentase Partisipasi"],
+          ...classRows
+        ];
+        const wsKelas = XLSX.utils.aoa_to_sheet(wsKelasData);
+        wsKelas['!cols'] = [{ wch: 6 }, { wch: 14 }, { wch: 18 }, { wch: 16 }, { wch: 16 }, { wch: 22 }];
+        XLSX.utils.book_append_sheet(wb, wsKelas, "Partisipasi_Kelas");
+
+        // Sheet 3: Demografi Gender
+        const genderRows = (data.participation_by_gender || []).map((g, idx) => {
+          return [idx + 1, g.gender, g.total, g.voted, g.not_voted, (g.pct || 0) + '%'];
+        });
+        const wsGenderData = [
+          ["DEMOGRAFI PEMILIH BERDASARKAN JENIS KELAMIN"],
+          ["UPTD SMP NEGERI 13 PENAJAM PASER UTARA"],
+          [`Tanggal Ekspor: ${new Date().toLocaleString('id-ID')}`],
+          [],
+          ["No", "Jenis Kelamin", "Total DPT", "Sudah Memilih", "Belum Memilih", "Partisipasi (%)"],
+          ...genderRows
+        ];
+        const wsGender = XLSX.utils.aoa_to_sheet(wsGenderData);
+        wsGender['!cols'] = [{ wch: 6 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }];
+        XLSX.utils.book_append_sheet(wb, wsGender, "Demografi_Gender");
+
+        XLSX.writeFile(wb, "rekapitulasi_hasil_pemilihan_osis_smpn13ppu.xlsx");
+        showToast("Berkas Excel rekapitulasi berhasil diunduh!", "success");
+      } catch (err) {
+        console.error('exportRekapExcel error:', err);
+        showToast('Gagal membuat berkas Excel.', 'error');
+      }
+    }
+
+    // Ekspor Excel DPT Pemilih Lengkap
+    async function exportDptExcel() {
+      if (typeof XLSX === 'undefined') {
+        showToast('Pustaka Excel belum siap. Silakan muat ulang halaman.', 'error');
+        return;
+      }
+      showToast('Mengambil seluruh data DPT pemilih...', 'info');
+
+      let votersList = allVoters;
+      try {
+        if (!votersList || votersList.length === 0 || votersList.length < votersTotalCount) {
+          if (!isValidUUID(adminToken)) await ensureAuth(true);
+          const res = await rpc('admin_get_voters', { p_token: adminToken, p_limit: 5000, p_offset: 0, p_search: '' });
+          if (res && res.ok && res.data?.rows) {
+            votersList = res.data.rows;
+          }
+        }
+
+        if (!votersList || votersList.length === 0) {
+          showToast('Belum ada data pemilih yang dapat diekspor.', 'error');
+          return;
+        }
+
+        const rows = votersList.map((v, i) => [
+          i + 1,
+          String(v.nisn || ''),
+          v.name || '',
+          v.class || '',
+          v.gender || '',
+          v.religion || '',
+          v.has_voted ? 'Sudah Memilih' : 'Belum Memilih',
+          v.voted_at ? new Date(v.voted_at).toLocaleString('id-ID') : '—'
+        ]);
+
+        const wsData = [
+          ["DAFTAR PEMILIH TETAP (DPT) LENGKAP"],
+          ["PEMILIHAN KETUA & WAKIL KETUA OSIS SMPN 13 PENAJAM PASER UTARA"],
+          [`Tanggal Ekspor: ${new Date().toLocaleString('id-ID')}`],
+          [`Total Pemilih: ${votersList.length} Siswa`],
+          [],
+          ["No", "NISN", "Nama Lengkap Siswa", "Kelas", "Jenis Kelamin", "Agama", "Status Hak Pilih", "Waktu Memilih"],
+          ...rows
+        ];
+
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        ws['!cols'] = [{ wch: 6 }, { wch: 16 }, { wch: 28 }, { wch: 12 }, { wch: 15 }, { wch: 14 }, { wch: 18 }, { wch: 22 }];
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "DPT_Pemilih");
+        XLSX.writeFile(wb, "dpt_pemilih_lengkap_osis_smpn13ppu.xlsx");
+        showToast(`Berhasil mengekspor ${votersList.length} data pemilih ke Excel!`, 'success');
+      } catch (err) {
+        console.error('exportDptExcel error:', err);
+        showToast('Gagal mengekspor data DPT ke Excel.', 'error');
+      }
+    }
+
+    // Helper Download CSV dengan UTF-8 BOM
+    function downloadCsv(filename, rows) {
+      const processRow = function (row) {
+        let finalVal = '';
+        for (let j = 0; j < row.length; j++) {
+          let innerValue = row[j] === null || row[j] === undefined ? '' : row[j].toString();
+          let result = innerValue.replace(/"/g, '""');
+          if (result.search(/("|,|\n)/g) >= 0)
+            result = '"' + result + '"';
+          if (j > 0)
+            finalVal += ',';
+          finalVal += result;
+        }
+        return finalVal + '\r\n';
+      };
+
+      let csvContent = '\uFEFF';
+      for (let i = 0; i < rows.length; i++) {
+        csvContent += processRow(rows[i]);
+      }
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('download', filename);
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Ekspor CSV Rekapitulasi Suara
+    async function exportRekapCsv() {
+      const data = cachedAnalyticsData || await fetchAnalyticsData();
+      if (!data) {
+        showToast('Gagal mengambil data untuk ekspor CSV.', 'error');
+        return;
+      }
+      const totalVotes = data.total_votes || 0;
+      const rows = [
+        ["Nomor Urut", "Nama Paslon", "Calon Ketua", "Calon Wakil", "Perolehan Suara", "Persentase"]
+      ];
+      (data.candidates_votes || []).forEach(c => {
+        const vCount = c.vote_count || 0;
+        const pct = totalVotes > 0 ? ((vCount / totalVotes) * 100).toFixed(1) + '%' : '0.0%';
+        const chairman = c.chairman || (c.name ? c.name.split('&')[0].trim() : '—');
+        const vice = c.vice_chairman || (c.name && c.name.includes('&') ? c.name.split('&')[1].trim() : '—');
+        rows.push([c.number, c.name, chairman, vice, vCount, pct]);
+      });
+      downloadCsv('rekap_hasil_pemilihan_osis.csv', rows);
+      showToast('Berkas CSV rekapitulasi suara berhasil diunduh!', 'success');
+    }
+
+    // Ekspor CSV DPT Pemilih
+    async function exportDptCsv() {
+      showToast('Mengambil data DPT...', 'info');
+      let votersList = allVoters;
+      if (!votersList || votersList.length === 0 || votersList.length < votersTotalCount) {
+        if (!isValidUUID(adminToken)) await ensureAuth(true);
+        const res = await rpc('admin_get_voters', { p_token: adminToken, p_limit: 5000, p_offset: 0, p_search: '' });
+        if (res && res.ok && res.data?.rows) {
+          votersList = res.data.rows;
+        }
+      }
+      if (!votersList || votersList.length === 0) {
+        showToast('Belum ada data pemilih yang dapat diekspor.', 'error');
+        return;
+      }
+      const rows = [
+        ["No", "NISN", "Nama", "Kelas", "Jenis Kelamin", "Agama", "Status Memilih", "Waktu Memilih"]
+      ];
+      votersList.forEach((v, i) => {
+        rows.push([
+          i + 1,
+          v.nisn,
+          v.name,
+          v.class || '',
+          v.gender || '',
+          v.religion || '',
+          v.has_voted ? 'Sudah' : 'Belum',
+          v.voted_at || ''
+        ]);
+      });
+      downloadCsv('dpt_pemilih_osis.csv', rows);
+      showToast('Berkas CSV data DPT berhasil diunduh!', 'success');
+    }
+
+    // Pemicu Cetak Berita Acara (Window Print)
+    async function triggerPrint() {
+      if (currentTab !== 'laporan') {
+        switchTab('laporan');
+        await loadLaporan();
+      } else if (!cachedAnalyticsData) {
+        await loadLaporan();
+      }
+      // Tunggu sejenak agar DOM render selesai dengan sempurna
+      setTimeout(() => {
+        window.print();
+      }, 300);
+    }
+
+    // Bind Tombol & Interaksi Tab Laporan
+    $('btn-trigger-print')?.addEventListener('click', triggerPrint);
+    $('btn-print-doc')?.addEventListener('click', triggerPrint);
+    $('btn-quick-print')?.addEventListener('click', triggerPrint);
+    $('btn-quick-goto-laporan')?.addEventListener('click', () => {
+      switchTab('laporan');
+      loadTab('laporan');
+    });
+
+    $('btn-refresh-laporan')?.addEventListener('click', async () => {
+      showToast('Memperbarui data laporan...', 'info');
+      await loadLaporan();
+      showToast('Data laporan berhasil diperbarui.', 'success');
+    });
+
+    $('btn-export-excel-rekap')?.addEventListener('click', exportRekapExcel);
+    $('btn-export-excel-dpt')?.addEventListener('click', exportDptExcel);
+    $('btn-export-csv-rekap')?.addEventListener('click', exportRekapCsv);
+    $('btn-export-csv-dpt')?.addEventListener('click', exportDptCsv);
+
+    // Live update saat input konfigurasi dokumen diubah
+    ['cfg-doc-nomor', 'cfg-doc-lokasi', 'cfg-doc-kepsek', 'cfg-doc-nip-kepsek', 'cfg-doc-pembina', 'cfg-doc-nip-pembina', 'cfg-doc-panitia'].forEach(id => {
+      $(id)?.addEventListener('input', () => {
+        if (cachedAnalyticsData) renderBeritaAcaraDocument();
+      });
+    });
+
+    // ─── Close dialog on overlay click ────────────────────────────────────────
+    ['overlay-reset-1','overlay-reset-2','overlay-candidate-form','overlay-delete-candidate','overlay-delete-voter','overlay-bulk-delete'].forEach(id => {
+      const el = $(id);
+      if (el) {
+        el.addEventListener('click', e => { if (e.target === el) el.classList.add('hidden'); });
+        el.addEventListener('keydown', e => { if (e.key === 'Escape') el.classList.add('hidden'); });
+      }
+    });
+
+    // ─── Start ─────────────────────────────────────────────────────────────────
+    init();
+  </script>
+</body>
+</html>

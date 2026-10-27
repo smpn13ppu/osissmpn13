@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Analitik — Pemilihan Ketua OSIS SMPN 13 PPU</title>
+  <meta name="description" content="Dashboard analitik & demografi pemilihan Ketua OSIS SMPN 13 Penajam Paser Utara." />
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    /* ── Analytics Layout & Theme ── */
+    :root {
+      --color-gender-l: #0077b6;
+      --color-gender-l-light: rgba(0, 119, 182, 0.12);
+      --color-gender-p: #c1121f;
+      --color-gender-p-light: rgba(193, 18, 31, 0.12);
+      --color-p1: #c1121f;
+      --color-p2: #0077b6;
+    }
+
+    body {
+      background: #fdf0d5;
+      color: #003049;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    .analytics-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Topbar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      background: #003049;
+      color: #ffffff;
+      z-index: 100;
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 4px 16px rgba(0, 48, 73, 0.18);
+    }
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 28px;
+      max-width: 1360px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .topbar-brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .topbar-brand {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+    .topbar-badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #2ec4b6;
+      background: rgba(46, 196, 182, 0.15);
+      border: 1px solid rgba(46, 196, 182, 0.35);
+      padding: 3px 9px;
+      border-radius: 20px;
+    }
+    .topbar-badge-live::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: #2ec4b6;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #2ec4b6;
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-topbar {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 7px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 180ms ease;
+    }
+    .btn-topbar-back {
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.20);
+    }
+    .btn-topbar-back:hover {
+      background: rgba(255, 255, 255, 0.20);
+      color: #ffffff;
+    }
+    .btn-topbar-reload {
+      background: #c1121f;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .btn-topbar-reload:hover {
+      background: #780000;
+    }
+
+    /* Content Area */
+    .analytics-content {
+      flex: 1;
+      padding: 28px 28px 60px;
+      max-width: 1360px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Page Header */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .page-header-info h1 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: #003049;
+      letter-spacing: -0.02em;
+      margin: 0 0 4px 0;
+    }
+    .page-header-info p {
+      font-size: 13.5px;
+      color: rgba(0, 48, 73, 0.70);
+      margin: 0;
+    }
+
+    /* ── Metric Stat Cards ── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: #ffffff;
+      border: 1.5px solid #e7dfce;
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: 0 3px 12px rgba(0, 48, 73, 0.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 48, 73, 0.09);
+    }
+    .stat-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .stat-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: rgba(0, 48, 73, 0.60);
+      margin: 0;
+    }
+    .stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .stat-icon svg {
+      width: 17px;
+      height: 17px;
+    }
+    .stat-value {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #003049;
+      line-height: 1.1;
+      margin: 0 0 6px 0;
+    }
+    .stat-sub {
+      font-size: 12.5px;
+      color: rgba(0, 48, 73, 0.65);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .stat-progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(0, 48, 73, 0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .stat-progress-fill {
+      height: 100%;
+      background: #c1121f;
+      border-radius: 10px;
+      transition: width 600ms ease;
+    }
+
+    /* ── Section Titles ── */
+    .section-heading-wrap {
+      margin-bottom: 16px;
+    }
+    .section-badge {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #c1121f;
+      background: rgba(193, 18, 31, 0.10);
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+    }
+    .section-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #003049;
+      margin: 0 0 3px 0;
+      letter-spacing: -0.01em;
+    }
+    .section-desc {
+      font-size: 13px;
+      color: rgba(0, 48, 73, 0.65);
+      margin: 0;
+    }
+
+    /* ── Chart Card Styles ── */
+    .chart-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .chart-grid-gender {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .chart-card {
+      background: #ffffff;
+      border: 1.5px solid #e7dfce;
+      border-radius: 14px;
+      padding: 22px 24px;
+      box-shadow: 0 3px 12px rgba(0, 48, 73, 0.05);
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .chart-card-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: #003049;
+      margin: 0 0 2px 0;
+    }
+    .chart-card-subtitle {
+      font-size: 12px;
+      color: rgba(0, 48, 73, 0.60);
+      margin: 0;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 270px;
+      width: 100%;
+    }
+    .chart-wrap-pie {
+      position: relative;
+      height: 220px;
+      width: 100%;
+    }
+
+    /* Pills filter */
+    .filter-pills {
+      display: inline-flex;
+      background: rgba(0, 48, 73, 0.08);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .pill-btn {
+      background: none;
+      border: none;
+      padding: 4px 11px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #003049;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 160ms ease;
+    }
+    .pill-btn:hover {
+      color: #c1121f;
+    }
+    .pill-btn.active {
+      background: #ffffff;
+      color: #c1121f;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Gender Pie Legend Box */
+    .gender-pie-legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #e7dfce;
+    }
+    .gender-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: #fdfaf4;
+      border: 1px solid #ede3d1;
+    }
+    .gender-legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .gender-legend-text {
+      flex: 1;
+      font-size: 11.5px;
+      line-height: 1.25;
+    }
+    .gender-legend-text strong {
+      display: block;
+      color: #003049;
+      font-size: 13px;
+    }
+
+    /* Gender Demographic Table Card */
+    .gender-table-card {
+      background: #ffffff;
+      border: 1.5px solid #e7dfce;
+      border-radius: 14px;
+      padding: 20px 24px;
+      box-shadow: 0 3px 12px rgba(0, 48, 73, 0.05);
+      margin-bottom: 30px;
+    }
+    .gender-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    .gender-table th {
+      text-align: left;
+      padding: 8px 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: rgba(0, 48, 73, 0.65);
+      border-bottom: 1.5px solid #e7dfce;
+    }
+    .gender-table td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(0, 48, 73, 0.07);
+      color: #003049;
+      vertical-align: middle;
+    }
+    .gender-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 12.5px;
+      padding: 3px 10px;
+      border-radius: 6px;
+    }
+    .gender-tag.l {
+      color: #0077b6;
+      background: rgba(0, 119, 182, 0.10);
+    }
+    .gender-tag.p {
+      color: #c1121f;
+      background: rgba(193, 18, 31, 0.10);
+    }
+
+    /* Class Breakdown Table */
+    .class-breakdown-box {
+      margin-top: 16px;
+      border-top: 1px solid #e7dfce;
+      padding-top: 12px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .class-breakdown-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .class-breakdown-table th {
+      text-align: left;
+      padding: 7px 10px;
+      font-weight: 700;
+      color: rgba(0, 48, 73, 0.65);
+      border-bottom: 1px solid #e7dfce;
+      position: sticky;
+      top: 0;
+      background: #ffffff;
+      z-index: 1;
+    }
+    .class-breakdown-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid rgba(0, 48, 73, 0.06);
+      color: #003049;
+    }
+    .class-breakdown-table tr:hover {
+      background: rgba(0, 48, 73, 0.025);
+    }
+    .lead-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+    .lead-badge.p1 {
+      background: rgba(193, 18, 31, 0.12);
+      color: #c1121f;
+    }
+    .lead-badge.p2 {
+      background: rgba(0, 119, 182, 0.12);
+      color: #0077b6;
+    }
+    .lead-badge.tie {
+      background: rgba(0, 48, 73, 0.10);
+      color: #003049;
+    }
+
+    /* Empty State for Charts */
+    .chart-empty-msg {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: rgba(0, 48, 73, 0.50);
+      font-size: 13px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Notice Banner SQL */
+    .sql-hint-banner {
+      background: #fff8e6;
+      border: 1px solid #ffd166;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: 12.5px;
+      color: #7c5800;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .sql-hint-banner code {
+      background: rgba(0,0,0,0.06);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      color: #003049;
+    }
+
+    @media (max-width: 1024px) {
+      .stat-row { grid-template-columns: repeat(2, 1fr); }
+      .chart-grid-2, .chart-grid-gender { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .stat-row { grid-template-columns: 1fr; }
+      .topbar-inner { padding: 10px 16px; }
+      .analytics-content { padding: 18px 14px 40px; }
+      .gender-pie-legend { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="analytics-shell">
+
+    <!-- Topbar -->
+    <nav class="topbar" aria-label="Navigasi analitik">
+      <div class="topbar-inner">
+        <div class="topbar-brand-wrap">
+          <span class="topbar-brand">Analitik Pemilihan — SMPN 13 PPU</span>
+          <span class="topbar-badge-live">Live</span>
+        </div>
+        <div class="topbar-actions">
+          <button type="button" class="btn-topbar btn-topbar-reload" id="btn-reload" aria-label="Segarkan data analitik">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span id="btn-reload-text">Segarkan Data</span>
+          </button>
+          <a href="admin.html" class="btn-topbar btn-topbar-back">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Kembali ke Admin
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Konten Utama -->
+    <main class="analytics-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-info">
+          <h1>Dashboard Analitik &amp; Statistik Pemilihan</h1>
+          <p>Pemilihan Ketua &amp; Wakil Ketua OSIS — SMP Negeri 13 Penajam Paser Utara</p>
+        </div>
+      </div>
+
+      <!-- Hint banner untuk sinkronisasi SQL gender jika belum dijalankan -->
+      <div class="sql-hint-banner" id="banner-sql-hint" style="display: none;">
+        <div>
+          <strong>Info Pembaruan SQL:</strong> Agar data rincian pemilih laki-laki &amp; perempuan yang memilih paslon muncul secara live, pastikan script <code>sql/fix_analytics.sql</code> telah dijalankan di Supabase SQL Editor.
+        </div>
+        <button type="button" onclick="this.parentElement.style.display='none'" style="background:none;border:none;font-weight:700;cursor:pointer;color:#7c5800;">✕</button>
+      </div>
+
+      <!-- Row 1: Metrik Ringkasan (Stat Cards) -->
+      <div class="stat-row">
+        <!-- Total DPT -->
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <span class="stat-label">Total DPT</span>
+            <div class="stat-icon" style="background: rgba(0, 48, 73, 0.08); color: #003049;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+          </div>
+          <div class="stat-value font-numeric" id="stat-total">—</div>
+          <div class="stat-sub">
+            <span>Daftar Pemilih Tetap</span>
+            <span id="stat-gender-ratio" style="font-weight: 600; font-size: 11px;">—</span>
+          </div>
+        </div>
+
+        <!-- Suara Masuk -->
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <span class="stat-label">Suara Masuk</span>
+            <div class="stat-icon" style="background: rgba(46, 196, 182, 0.15); color: #008779;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+          </div>
+          <div class="stat-value font-numeric" id="stat-voted" style="color: #008779;">—</div>
+          <div class="stat-sub">
+            <span>Suara sah tercatat</span>
+            <span id="stat-voted-detail" style="font-weight: 600; font-size: 11px;">—</span>
+          </div>
+        </div>
+
+        <!-- Belum Memilih -->
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <span class="stat-label">Belum Memilih</span>
+            <div class="stat-icon" style="background: rgba(193, 18, 31, 0.10); color: #c1121f;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+          </div>
+          <div class="stat-value font-numeric" id="stat-abstain" style="color: #c1121f;">—</div>
+          <div class="stat-sub">
+            <span>Belum memberikan suara</span>
+            <span id="stat-abstain-detail" style="font-weight: 600; font-size: 11px;">—</span>
+          </div>
+        </div>
+
+        <!-- Tingkat Partisipasi -->
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <span class="stat-label">Tingkat Partisipasi</span>
+            <div class="stat-icon" style="background: rgba(0, 119, 182, 0.12); color: #0077b6;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+          </div>
+          <div class="stat-value font-numeric" id="stat-pct" style="color: #0077b6;">—</div>
+          <div class="stat-sub">
+            <span>Partisipasi Pemilih</span>
+            <span id="stat-pct-detail" style="font-weight: 600; font-size: 11px;">—</span>
+          </div>
+          <div class="stat-progress-bar">
+            <div class="stat-progress-fill" id="stat-progress-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════════════════
+           SECTION: ANALISIS SUARA BERDASARKAN GENDER (LAKI-LAKI & PEREMPUAN)
+      ══════════════════════════════════════════════════════════════════════════ -->
+      <div class="section-heading-wrap">
+        <span class="section-badge">DEMOGRAFI &amp; GENDER</span>
+        <h2 class="section-title">Pilihan Paslon Berdasarkan Jenis Kelamin</h2>
+        <p class="section-desc">Distribusi suara pemilih laki-laki dan pemilih perempuan untuk setiap pasangan calon OSIS.</p>
+      </div>
+
+      <div class="chart-grid-gender">
+        <!-- Card 1: Diagram Lingkaran (Pie / Donut) Pilihan per Gender -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h3 class="chart-card-title">Diagram Lingkaran Suara Gender</h3>
+              <p class="chart-card-subtitle" id="gender-pie-sub">Proporsi pilihan pasangan calon oleh pemilih</p>
+            </div>
+            <div class="filter-pills" role="tablist" aria-label="Filter gender diagram lingkaran">
+              <button type="button" class="pill-btn active" id="btn-gender-l" data-gender="Laki-laki">Laki-laki</button>
+              <button type="button" class="pill-btn" id="btn-gender-p" data-gender="Perempuan">Perempuan</button>
+              <button type="button" class="pill-btn" id="btn-gender-all" data-gender="Semua">Semua</button>
+            </div>
+          </div>
+
+          <div class="chart-wrap-pie">
+            <canvas id="chart-gender-pie" aria-label="Diagram lingkaran pilihan paslon berdasarkan gender"></canvas>
+          </div>
+
+          <!-- Custom Legend Box -->
+          <div class="gender-pie-legend" id="gender-pie-legend-box">
+            <div class="gender-legend-item">
+              <div class="gender-legend-color" style="background: #c1121f;"></div>
+              <div class="gender-legend-text">
+                <span id="leg-p1-title">Paslon 01</span>
+                <strong id="leg-p1-val">— suara (0.0%)</strong>
+              </div>
+            </div>
+            <div class="gender-legend-item">
+              <div class="gender-legend-color" style="background: #0077b6;"></div>
+              <div class="gender-legend-text">
+                <span id="leg-p2-title">Paslon 02</span>
+                <strong id="leg-p2-val">— suara (0.0%)</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Komparasi Gender Pemilih Tiap Paslon (Grouped Bar Chart) -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h3 class="chart-card-title">Komparasi Suara Gender per Paslon</h3>
+              <p class="chart-card-subtitle">Perbandingan langsung pemilih Laki-laki vs Perempuan untuk setiap paslon</p>
+            </div>
+          </div>
+
+          <div class="chart-wrap">
+            <canvas id="chart-gender-bar" aria-label="Grafik komparasi suara laki-laki dan perempuan per paslon"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Rincian Demografi Gender Pemilih (Tabel Rangkuman) -->
+      <div class="gender-table-card">
+        <div class="chart-card-header" style="margin-bottom: 8px;">
+          <div>
+            <h3 class="chart-card-title">Tabel Rincian Partisipasi &amp; Pilihan Gender</h3>
+            <p class="chart-card-subtitle">Rekapitulasi hak suara, partisipasi, dan pasangan calon yang dipilih siswa</p>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="gender-table">
+            <thead>
+              <tr>
+                <th>Jenis Kelamin</th>
+                <th>DPT (Terdaftar)</th>
+                <th>Sudah Memilih</th>
+                <th>Belum Memilih</th>
+                <th>Partisipasi (%)</th>
+                <th id="th-gender-p1">Suara Paslon 01</th>
+                <th id="th-gender-p2">Suara Paslon 02</th>
+                <th>Paslon Unggul</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-gender-summary">
+              <tr><td colspan="8" style="text-align:center; padding:16px; color:rgba(0,48,73,0.5);">Memuat data demografi gender...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════════════════
+           SECTION: PEROLEHAN SUARA PASLON & KELAS
+      ══════════════════════════════════════════════════════════════════════════ -->
+      <div class="section-heading-wrap">
+        <span class="section-badge">HASIL &amp; KELAS</span>
+        <h2 class="section-title">Hasil Perolehan Suara &amp; Sebaran Kelas</h2>
+        <p class="section-desc">Statistik perolehan suara total pasangan calon serta sebaran partisipasi siswa di setiap kelas.</p>
+      </div>
+
+      <div class="chart-grid-2">
+        <!-- Card 4: Perolehan Suara Total per Paslon -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h3 class="chart-card-title">Perolehan Suara per Paslon</h3>
+              <p class="chart-card-subtitle">Akumulasi suara sah dari seluruh pemilih</p>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart-votes-per-candidate" aria-label="Grafik perolehan suara per paslon"></canvas>
+          </div>
+        </div>
+
+        <!-- Card 5: Partisipasi per Kelas -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h3 class="chart-card-title">Partisipasi Pemilih per Kelas</h3>
+              <p class="chart-card-subtitle">Perbandingan siswa yang sudah vs belum memilih di setiap kelas</p>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart-participation-per-class" aria-label="Grafik partisipasi per kelas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6: Sebaran Suara Paslon di Setiap Kelas (Full Width) -->
+      <div class="chart-card" style="margin-bottom: 24px;">
+        <div class="chart-card-header">
+          <div>
+            <h3 class="chart-card-title">Sebaran Suara Paslon di Setiap Kelas</h3>
+            <p class="chart-card-subtitle">Proporsi pilihan paslon siswa berdasarkan kelas (Kelas 7A s/d 9D)</p>
+          </div>
+          <div class="filter-pills" role="tablist" aria-label="Mode tampilan grafik kelas">
+            <button type="button" class="pill-btn active" id="btn-chart-pct" data-mode="pct">% Persentase</button>
+            <button type="button" class="pill-btn" id="btn-chart-count" data-mode="count">Jumlah Suara</button>
+          </div>
+        </div>
+
+        <div class="chart-wrap" style="height: 280px;">
+          <canvas id="chart-votes-per-class-candidate" aria-label="Grafik persentase suara per kelas dan paslon"></canvas>
+        </div>
+
+        <div class="class-breakdown-box" id="class-breakdown-wrap">
+          <table class="class-breakdown-table">
+            <thead>
+              <tr>
+                <th>Kelas</th>
+                <th>Total Suara</th>
+                <th id="th-cand-1">Paslon 01 (%)</th>
+                <th id="th-cand-2">Paslon 02 (%)</th>
+                <th>Unggul</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-class-breakdown">
+              <tr><td colspan="5" style="text-align:center; color:rgba(0,48,73,0.5);">Memuat rincian per kelas...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Card 7: Tren Suara per Jam -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <h3 class="chart-card-title">Tren Kecepatan Suara per Jam</h3>
+            <p class="chart-card-subtitle">Aktivitas pemberian hak suara pemilih sepanjang waktu pemilihan</p>
+          </div>
+        </div>
+        <div class="chart-wrap" style="height: 240px;">
+          <canvas id="chart-trend" aria-label="Grafik tren suara per jam"></canvas>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script>
+    'use strict';
+
+    let sbClient = null;
+    function getSbClient() {
+      if (!sbClient && window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+        try {
+          sbClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+        } catch(e) {}
+      }
+      return sbClient;
+    }
+    getSbClient();
+
+    const $ = id => document.getElementById(id);
+
+    // Admin authentication
+    let adminToken = localStorage.getItem('osis_admin_token') || sessionStorage.getItem('osis_admin_token') || null;
+
+    function isValidUUID(str) {
+      return typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+    }
+
+    async function ensureAuth(force = false) {
+      if (!force && isValidUUID(adminToken)) return true;
+      try {
+        const res = await rpc('admin_login', { p_password: 'guru13' });
+        if (res && res.ok && res.data?.token) {
+          adminToken = res.data.token;
+          localStorage.setItem('osis_admin_token', adminToken);
+          sessionStorage.setItem('osis_admin_token', adminToken);
+          return true;
+        }
+      } catch (e) {
+        console.warn('Auto auth error:', e);
+      }
+      return false;
+    }
+
+    async function rpc(fn, params = {}) {
+      const client = getSbClient();
+      if (client) {
+        try {
+          const { data, error } = await client.rpc(fn, params);
+          if (!error && data !== undefined && data !== null) {
+            return data;
+          }
+        } catch(err) {
+          console.warn(`client.rpc('${fn}') exception:`, err);
+        }
+      }
+
+      // Fallback REST fetch native
+      if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+        try {
+          const res = await fetch(`${window.SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+            method: 'POST',
+            headers: {
+              'apikey': window.SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${window.SUPABASE_ANON_KEY}`,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(params || {})
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            return { ok: false, error: errData?.message || errData?.error || `HTTP ${res.status}` };
+          }
+
+          const data = await res.json();
+          return data;
+        } catch(fetchErr) {
+          console.error(`REST fetch('${fn}') error:`, fetchErr);
+          return { ok: false, error: fetchErr.message || 'Koneksi ke server gagal.' };
+        }
+      }
+
+      return { ok: false, error: 'Database belum terhubung.' };
+    }
+
+    function escHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+    }
+
+    // Helper untuk merangkum nama Ketua & Wakil Paslon
+    function getCandidateInfo(c) {
+      if (!c) return { number: '', chairman: 'Kandidat', vice_chairman: '', pairName: 'Kandidat', multiline: ['Kandidat'] };
+
+      let chairman = (c.chairman || '').trim();
+      let vice = (c.vice_chairman || '').trim();
+
+      // Jika chairman atau vice belum terpisah, periksa dari field c.name
+      if ((!chairman || !vice) && c.name) {
+        if (c.name.includes('&')) {
+          const parts = c.name.split('&');
+          if (!chairman) chairman = parts[0]?.trim() || '';
+          if (!vice) vice = parts[1]?.trim() || '';
+        } else if (c.name.includes('/')) {
+          const parts = c.name.split('/');
+          if (!chairman) chairman = parts[0]?.trim() || '';
+          if (!vice) vice = parts[1]?.trim() || '';
+        } else if (!chairman) {
+          chairman = c.name.trim();
+        }
+      }
+
+      if (!chairman && c.name) chairman = c.name.trim();
+      if (!chairman) chairman = `Paslon 0${c.number || ''}`;
+
+      const numStr = c.number ? String(c.number).padStart(2, '0') : '';
+      const pairName = vice ? `${chairman} & ${vice}` : chairman;
+
+      return {
+        number: numStr,
+        chairman,
+        vice_chairman: vice,
+        pairName,
+        multiline: vice ? [`Paslon ${numStr}`, `${chairman} & ${vice}`] : [`Paslon ${numStr}`, chairman]
+      };
+    }
+
+    // ─── Chart defaults & colors ───────────────────────────────────────────────
+    const COLOR_P1 = '#c1121f';
+    const COLOR_P2 = '#0077b6';
+    const COLOR_P3 = '#2a9d8f';
+    const CANDIDATE_COLORS = [COLOR_P1, COLOR_P2, COLOR_P3, '#e76f51', '#f4a261', '#457b9d'];
+    const COLOR_GENDER_L = '#0077b6';
+    const COLOR_GENDER_P = '#c1121f';
+
+    if (window.Chart) {
+      Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+      Chart.defaults.font.size = 12;
+      Chart.defaults.color = '#003049';
+      Chart.defaults.plugins.legend.display = false;
+      Chart.defaults.animation = { duration: 400 };
+    }
+
+    const gridOpts = {
+      color: 'rgba(0,48,73,0.06)',
+      drawBorder: false,
+    };
+
+    const axisOpts = {
+      grid: gridOpts,
+      ticks: { color: 'rgba(0,48,73,0.7)', font: { size: 11.5, family: "'Inter', sans-serif" } },
+      beginAtZero: true,
+    };
+
+    // ─── Instance charts ───────────────────────────────────────────────────────
+    let charts = {};
+
+    function destroyCharts() {
+      Object.values(charts).forEach(c => c && c.destroy());
+      charts = {};
+    }
+
+    // State data analitik
+    let currentAnalyticsData = null;
+    let currentGenderPieFilter = 'Laki-laki'; // 'Laki-laki' | 'Perempuan' | 'Semua'
+    let currentClassChartMode = 'pct'; // 'pct' | 'count'
+
+    // ─── Render Ringkasan Metrik (Stat Cards) ──────────────────────────────────
+    function renderStats(data) {
+      const total = data.total_voters || 0;
+      const voted = data.total_votes || 0;
+      const abstain = total - voted;
+      const pct = total > 0 ? ((voted / total) * 100).toFixed(1) + '%' : '0.0%';
+
+      $('stat-total').textContent = total;
+      $('stat-voted').textContent = voted;
+      $('stat-abstain').textContent = abstain;
+      $('stat-pct').textContent = pct;
+
+      // Progress bar fill
+      if ($('stat-progress-fill')) {
+        $('stat-progress-fill').style.width = pct;
+      }
+
+      // Demografi gender di subtitle stat cards jika ada data
+      const partGender = data.participation_by_gender || [];
+      const lData = partGender.find(g => g.gender?.toLowerCase().startsWith('l'));
+      const pData = partGender.find(g => g.gender?.toLowerCase().startsWith('p'));
+
+      if (lData && pData) {
+        $('stat-gender-ratio').textContent = `L: ${lData.total} • P: ${pData.total}`;
+        $('stat-voted-detail').textContent = `L: ${lData.voted} • P: ${pData.voted}`;
+        $('stat-abstain-detail').textContent = `L: ${lData.not_voted} • P: ${pData.not_voted}`;
+        $('stat-pct-detail').textContent = `L: ${lData.pct}% • P: ${pData.pct}%`;
+      } else {
+        $('stat-gender-ratio').textContent = 'Semua Siswa Terdata';
+        $('stat-voted-detail').textContent = `${voted} siswa telah memilih`;
+        $('stat-abstain-detail').textContent = `${abstain} siswa belum memilih`;
+        $('stat-pct-detail').textContent = 'Target: 100%';
+      }
+    }
+
+    // ─── Chart 1: Diagram Lingkaran Suara Gender (Pie / Donut) ──────────────────
+    function renderChartGenderPie(data, selectedGender = currentGenderPieFilter) {
+      const ctx = $('chart-gender-pie')?.getContext('2d');
+      if (!ctx) return;
+
+      currentGenderPieFilter = selectedGender;
+      const candidates = data.candidates_votes || [];
+      const genderVotes = data.votes_by_gender_candidate || [];
+
+      // Filter data sesuai gender yang dipilih
+      let filteredData = [];
+      let totalGenderVotes = 0;
+
+      candidates.forEach(c => {
+        let count = 0;
+        if (selectedGender === 'Semua') {
+          count = c.vote_count || 0;
+        } else {
+          const match = genderVotes.find(r => r.candidate_id === c.id && r.gender?.toLowerCase().startsWith(selectedGender.toLowerCase().charAt(0)));
+          count = match ? (match.vote_count || 0) : 0;
+        }
+        totalGenderVotes += count;
+        filteredData.push({
+          candidate: c,
+          count: count
+        });
+      });
+
+      // Update subtitle info
+      if ($('gender-pie-sub')) {
+        $('gender-pie-sub').textContent = selectedGender === 'Semua'
+          ? `Total seluruh suara masuk: ${totalGenderVotes} suara`
+          : `Total suara dari pemilih ${selectedGender}: ${totalGenderVotes} suara`;
+      }
+
+      // Update custom legend
+      const p1Item = filteredData[0];
+      const p2Item = filteredData[1];
+      const info1 = getCandidateInfo(p1Item?.candidate);
+      const info2 = getCandidateInfo(p2Item?.candidate);
+
+      if (p1Item) {
+        const pct1 = totalGenderVotes > 0 ? ((p1Item.count / totalGenderVotes) * 100).toFixed(1) : '0.0';
+        $('leg-p1-title').textContent = `Paslon ${info1.number} (${info1.pairName})`;
+        $('leg-p1-val').textContent = `${p1Item.count} suara (${pct1}%)`;
+      }
+      if (p2Item) {
+        const pct2 = totalGenderVotes > 0 ? ((p2Item.count / totalGenderVotes) * 100).toFixed(1) : '0.0';
+        $('leg-p2-title').textContent = `Paslon ${info2.number} (${info2.pairName})`;
+        $('leg-p2-val').textContent = `${p2Item.count} suara (${pct2}%)`;
+      }
+
+      if (charts.genderPie) {
+        charts.genderPie.destroy();
+      }
+
+      // Jika belum ada suara, tampilkan doughnut placeholder abu-abu yang rapi
+      if (totalGenderVotes === 0) {
+        charts.genderPie = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Belum Ada Suara'],
+            datasets: [{
+              data: [1],
+              backgroundColor: ['rgba(0, 48, 73, 0.12)'],
+              borderColor: ['#e7dfce'],
+              borderWidth: 1,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: { label: () => ' Belum ada suara masuk dari pemilih ini' }
+              }
+            }
+          }
+        });
+        return;
+      }
+
+      charts.genderPie = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: filteredData.map(d => `Paslon 0${d.candidate.number}`),
+          datasets: [{
+            data: filteredData.map(d => d.count),
+            backgroundColor: [COLOR_P1, COLOR_P2, COLOR_P3],
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const val = ctx.raw || 0;
+                  const pct = totalGenderVotes > 0 ? ((val / totalGenderVotes) * 100).toFixed(1) : '0.0';
+                  const item = filteredData[ctx.dataIndex];
+                  const info = getCandidateInfo(item?.candidate);
+                  return ` Paslon ${info.number} (${info.pairName}): ${val} suara (${pct}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // ─── Chart 2: Komparasi Gender Pemilih Tiap Paslon (Grouped Bar) ───────────
+    function renderChartGenderBar(data) {
+      const ctx = $('chart-gender-bar')?.getContext('2d');
+      if (!ctx) return;
+
+      const candidates = data.candidates_votes || [];
+      const genderVotes = data.votes_by_gender_candidate || [];
+      const candidateInfos = candidates.map(c => getCandidateInfo(c));
+
+      const labels = candidateInfos.map(info => info.multiline);
+      
+      const maleCounts = candidates.map(c => {
+        const row = genderVotes.find(r => r.candidate_id === c.id && r.gender?.toLowerCase().startsWith('l'));
+        return row ? (row.vote_count || 0) : 0;
+      });
+
+      const femaleCounts = candidates.map(c => {
+        const row = genderVotes.find(r => r.candidate_id === c.id && r.gender?.toLowerCase().startsWith('p'));
+        return row ? (row.vote_count || 0) : 0;
+      });
+
+      if (charts.genderBar) {
+        charts.genderBar.destroy();
+      }
+
+      charts.genderBar = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Pemilih Laki-laki',
+              data: maleCounts,
+              backgroundColor: COLOR_GENDER_L,
+              borderRadius: 4,
+              barPercentage: 0.7,
+              categoryPercentage: 0.6
+            },
+            {
+              label: 'Pemilih Perempuan',
+              data: femaleCounts,
+              backgroundColor: COLOR_GENDER_P,
+              borderRadius: 4,
+              barPercentage: 0.7,
+              categoryPercentage: 0.6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: { boxWidth: 12, color: '#003049', font: { size: 12, weight: 'bold' } }
+            },
+            tooltip: {
+              callbacks: {
+                title: (items) => {
+                  const idx = items[0]?.dataIndex;
+                  const info = candidateInfos[idx];
+                  return info ? `Paslon ${info.number}: ${info.pairName}` : '';
+                },
+                label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.y} suara`
+              }
+            }
+          },
+          scales: {
+            x: { 
+              ...axisOpts, 
+              grid: { display: false },
+              ticks: {
+                ...axisOpts.ticks,
+                font: { size: 11.5, weight: '600', family: "'Inter', sans-serif" }
+              }
+            },
+            y: { ...axisOpts, ticks: { ...axisOpts.ticks, stepSize: 1 } }
+          }
+        }
+      });
+    }
+
+    // ─── Tabel Rincian Demografi Gender ───────────────────────────────────────
+    function renderGenderTable(data) {
+      const tbody = $('tbody-gender-summary');
+      if (!tbody) return;
+
+      const partGender = data.participation_by_gender || [];
+      const genderVotes = data.votes_by_gender_candidate || [];
+      const candidates = data.candidates_votes || [];
+
+      const info1 = getCandidateInfo(candidates[0]);
+      const info2 = getCandidateInfo(candidates[1]);
+
+      if (candidates[0]) $('th-gender-p1').textContent = `Suara Paslon ${info1.number} (${info1.pairName})`;
+      if (candidates[1]) $('th-gender-p2').textContent = `Suara Paslon ${info2.number} (${info2.pairName})`;
+
+      if (partGender.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:16px; color:rgba(0,48,73,0.5);">Belum ada data demografi pemilih.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = partGender.map(g => {
+        const isL = g.gender?.toLowerCase().startsWith('l');
+        const tagClass = isL ? 'l' : 'p';
+        const iconSvg = isL 
+          ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="10" cy="14" r="5"/><line x1="19" y1="5" x2="13.6" y2="10.4"/><line x1="19" y1="5" x2="14" y2="5"/><line x1="19" y1="5" x2="19" y2="10"/></svg>'
+          : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="9" r="5"/><line x1="12" y1="14" x2="12" y2="21"/><line x1="9" y1="18" x2="15" y2="18"/></svg>';
+
+        const v1 = candidates[0] ? (genderVotes.find(r => r.candidate_id === candidates[0].id && r.gender?.toLowerCase().startsWith(g.gender?.toLowerCase().charAt(0)))?.vote_count || 0) : 0;
+        const v2 = candidates[1] ? (genderVotes.find(r => r.candidate_id === candidates[1].id && r.gender?.toLowerCase().startsWith(g.gender?.toLowerCase().charAt(0)))?.vote_count || 0) : 0;
+        const totalVotedGender = v1 + v2;
+
+        let leadHtml = '<span style="color:rgba(0,48,73,0.4); font-size:11px;">Belum ada suara</span>';
+        if (totalVotedGender > 0) {
+          if (v1 > v2) leadHtml = '<span class="lead-badge p1">Unggul Paslon 01</span>';
+          else if (v2 > v1) leadHtml = '<span class="lead-badge p2">Unggul Paslon 02</span>';
+          else leadHtml = '<span class="lead-badge tie">Seri (50:50)</span>';
+        }
+
+        const pct1 = totalVotedGender > 0 ? ((v1 / totalVotedGender) * 100).toFixed(1) + '%' : '0.0%';
+        const pct2 = totalVotedGender > 0 ? ((v2 / totalVotedGender) * 100).toFixed(1) + '%' : '0.0%';
+
+        return `
+          <tr>
+            <td>
+              <span class="gender-tag ${tagClass}">
+                ${iconSvg}
+                ${escHtml(g.gender)}
+              </span>
+            </td>
+            <td><strong>${g.total}</strong> siswa</td>
+            <td><strong style="color:#008779;">${g.voted}</strong> suara</td>
+            <td><strong style="color:#c1121f;">${g.not_voted}</strong> siswa</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-weight:700; width:45px;">${g.pct}%</span>
+                <div style="flex:1; height:6px; background:rgba(0,48,73,0.08); border-radius:10px; overflow:hidden; max-width:80px;">
+                  <div style="height:100%; width:${g.pct}%; background:${isL ? COLOR_GENDER_L : COLOR_GENDER_P};"></div>
+                </div>
+              </div>
+            </td>
+            <td><strong>${v1}</strong> <span style="font-size:11px; color:rgba(0,48,73,0.5);">(${pct1})</span></td>
+            <td><strong>${v2}</strong> <span style="font-size:11px; color:rgba(0,48,73,0.5);">(${pct2})</span></td>
+            <td>${leadHtml}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ─── Chart 4: Perolehan Suara Total per Paslon (Bar) ──────────────────────
+    function renderChartCandidates(data) {
+      const candidates = data.candidates_votes || [];
+      const ctx = $('chart-votes-per-candidate')?.getContext('2d');
+      if (!ctx) return;
+
+      if (charts.candidates) charts.candidates.destroy();
+
+      const candidateInfos = candidates.map(c => getCandidateInfo(c));
+
+      charts.candidates = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: candidateInfos.map(info => info.multiline),
+          datasets: [{
+            label: 'Total Perolehan Suara',
+            data: candidates.map(c => c.vote_count || 0),
+            backgroundColor: [COLOR_P1, COLOR_P2, COLOR_P3],
+            borderRadius: 6,
+            borderWidth: 0,
+            barPercentage: 0.55
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                title: (items) => {
+                  const idx = items[0]?.dataIndex;
+                  const info = candidateInfos[idx];
+                  return info ? `Paslon ${info.number}: ${info.pairName}` : '';
+                },
+                label: (ctx) => {
+                  const val = ctx.parsed.y || 0;
+                  const tot = data.total_votes || 1;
+                  const pct = ((val / tot) * 100).toFixed(1);
+                  return ` Total Suara: ${val} (${pct}%)`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: { 
+              ...axisOpts, 
+              grid: { display: false },
+              ticks: {
+                ...axisOpts.ticks,
+                font: { size: 12, weight: '600', family: "'Inter', sans-serif" }
+              }
+            },
+            y: { ...axisOpts, ticks: { ...axisOpts.ticks, stepSize: 1 } },
+          },
+        },
+      });
+    }
+
+    // ─── Chart 5: Partisipasi per Kelas (Stacked Bar) ─────────────────────────
+    function renderChartParticipation(data) {
+      const classes = data.participation_by_class || [];
+      const ctx = $('chart-participation-per-class')?.getContext('2d');
+      if (!ctx) return;
+
+      if (charts.participation) charts.participation.destroy();
+
+      charts.participation = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: classes.map(c => c.class_name),
+          datasets: [
+            {
+              label: 'Sudah Memilih',
+              data: classes.map(c => c.voted || 0),
+              backgroundColor: '#008779',
+              stack: 'stack0',
+              borderRadius: 3,
+            },
+            {
+              label: 'Belum Memilih',
+              data: classes.map(c => c.not_voted || 0),
+              backgroundColor: 'rgba(0,48,73,0.18)',
+              stack: 'stack0',
+              borderRadius: 3,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: { boxWidth: 12, color: '#003049', font: { size: 11.5, weight: 'bold' } },
+            },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.y} siswa`
+              }
+            }
+          },
+          scales: {
+            x: { ...axisOpts, grid: { display: false }, stacked: true },
+            y: { ...axisOpts, stacked: true },
+          },
+        },
+      });
+    }
+
+    // ─── Chart 6: Sebaran Suara Paslon di Setiap Kelas ────────────────────────
+    function renderChartVotesPerClass(data) {
+      if (!data) return;
+      const byClass = data.votes_by_class_candidate || [];
+      const candidates = data.candidates_votes || [];
+      
+      const partClasses = (data.participation_by_class || []).map(r => r.class_name);
+      const voteClasses = byClass.map(r => r.class_name);
+      const classes = [...new Set([...partClasses, ...voteClasses])].filter(Boolean).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+      const classTotals = {};
+      const classCandidateMap = {};
+
+      classes.forEach(cls => {
+        classTotals[cls] = 0;
+        classCandidateMap[cls] = {};
+        candidates.forEach(c => {
+          const row = byClass.find(r => r.class_name === cls && r.candidate_id === c.id);
+          const cnt = row ? (row.vote_count || 0) : 0;
+          classCandidateMap[cls][c.id] = cnt;
+          classTotals[cls] += cnt;
+        });
+      });
+
+      const datasets = candidates.map((c, i) => {
+        const color = CANDIDATE_COLORS[i % CANDIDATE_COLORS.length];
+        const info = getCandidateInfo(c);
+        
+        return {
+          label: `Paslon ${info.number} (${info.pairName})`,
+          data: classes.map(cls => {
+            const votes = classCandidateMap[cls][c.id] || 0;
+            const total = classTotals[cls];
+            if (currentClassChartMode === 'pct') {
+              return total > 0 ? Number(((votes / total) * 100).toFixed(1)) : 0;
+            }
+            return votes;
+          }),
+          backgroundColor: color,
+          stack: 'stack0',
+          borderRadius: 2,
+        };
+      });
+
+      const ctx = $('chart-votes-per-class-candidate')?.getContext('2d');
+      if (!ctx) return;
+
+      if (charts.votesByClass) charts.votesByClass.destroy();
+
+      charts.votesByClass = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: classes, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: { boxWidth: 12, color: '#003049', font: { size: 11.5, weight: 'bold' } },
+            },
+            tooltip: {
+              callbacks: {
+                title: (items) => {
+                  const cls = items[0]?.label || '';
+                  const tot = classTotals[cls] || 0;
+                  return `Kelas ${cls} — Total Suara Sah: ${tot}`;
+                },
+                label: (ctx) => {
+                  const cls = ctx.label;
+                  const candIndex = ctx.datasetIndex;
+                  const cand = candidates[candIndex];
+                  if (!cand) return '';
+                  const votes = classCandidateMap[cls]?.[cand.id] || 0;
+                  const total = classTotals[cls] || 0;
+                  const pct = total > 0 ? ((votes / total) * 100).toFixed(1) : '0.0';
+                  return ` ${ctx.dataset.label}: ${pct}% (${votes} suara)`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: { ...axisOpts, grid: { display: false }, stacked: true },
+            y: {
+              ...axisOpts,
+              stacked: true,
+              min: 0,
+              max: currentClassChartMode === 'pct' ? 100 : undefined,
+              ticks: {
+                ...axisOpts.ticks,
+                callback: (val) => currentClassChartMode === 'pct' ? `${val}%` : val
+              }
+            },
+          },
+        },
+      });
+
+      renderClassBreakdownTable(classes, candidates, classCandidateMap, classTotals, byClass.length > 0 || data.total_votes > 0);
+    }
+
+    function renderClassBreakdownTable(classes, candidates, classCandidateMap, classTotals, hasData) {
+      const tbody = $('tbody-class-breakdown');
+      if (!tbody) return;
+
+      const info1 = getCandidateInfo(candidates[0]);
+      const info2 = getCandidateInfo(candidates[1]);
+
+      if (candidates[0]) $('th-cand-1').textContent = `Paslon ${info1.number} (${info1.pairName}) %`;
+      if (candidates[1]) $('th-cand-2').textContent = `Paslon ${info2.number} (${info2.pairName}) %`;
+
+      if (classes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:12px; color:rgba(0,48,73,0.5);">Belum ada kelas terdaftar.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = classes.map(cls => {
+        const total = classTotals[cls] || 0;
+        const v1 = candidates[0] ? (classCandidateMap[cls]?.[candidates[0].id] || 0) : 0;
+        const v2 = candidates[1] ? (classCandidateMap[cls]?.[candidates[1].id] || 0) : 0;
+        const pct1 = total > 0 ? ((v1 / total) * 100).toFixed(1) + '%' : '0.0%';
+        const pct2 = total > 0 ? ((v2 / total) * 100).toFixed(1) + '%' : '0.0%';
+
+        let leadHtml = '<span style="color:rgba(0,48,73,0.4); font-size:11px;">Belum ada suara</span>';
+        if (total > 0) {
+          if (v1 > v2) leadHtml = '<span class="lead-badge p1">Unggul Paslon 01</span>';
+          else if (v2 > v1) leadHtml = '<span class="lead-badge p2">Unggul Paslon 02</span>';
+          else leadHtml = '<span class="lead-badge tie">Seri (50:50)</span>';
+        }
+
+        return `
+          <tr>
+            <td><strong>${escHtml(cls)}</strong></td>
+            <td>${total} suara</td>
+            <td><strong style="color:#c1121f;">${pct1}</strong> <span style="color:rgba(0,48,73,0.5); font-size:11px;">(${v1} suara)</span></td>
+            <td><strong style="color:#0077b6;">${pct2}</strong> <span style="color:rgba(0,48,73,0.5); font-size:11px;">(${v2} suara)</span></td>
+            <td>${leadHtml}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ─── Chart 7: Tren Suara per Jam ──────────────────────────────────────────
+    function renderChartTrend(data) {
+      const trend = data.votes_per_hour || [];
+      const ctx = $('chart-trend')?.getContext('2d');
+      if (!ctx) return;
+
+      if (charts.trend) charts.trend.destroy();
+
+      charts.trend = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: trend.map(r => r.hour + ':00'),
+          datasets: [{
+            label: 'Suara per Jam',
+            data: trend.map(r => r.vote_count || 0),
+            borderColor: '#c1121f',
+            backgroundColor: 'rgba(193,18,31,0.08)',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#c1121f',
+            borderWidth: 2.5,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: { label: (ctx) => ` Suara masuk: ${ctx.parsed.y} suara` }
+            }
+          },
+          scales: {
+            x: { ...axisOpts, grid: { display: false } },
+            y: { ...axisOpts, ticks: { ...axisOpts.ticks, stepSize: 1 } },
+          },
+        },
+      });
+    }
+
+    // ─── Fallback Builder jika database memerlukan kalkulasi mandiri ───────────
+    async function buildAnalyticsFallback() {
+      if (!isValidUUID(adminToken)) await ensureAuth(true);
+
+      let qcRes = await rpc('admin_quick_count', { p_token: adminToken });
+      if (!qcRes || !qcRes.ok) {
+        await ensureAuth(true);
+        qcRes = await rpc('admin_quick_count', { p_token: adminToken });
+      }
+      const qcData = qcRes?.data || { total_voters: 0, total_votes: 0, candidates: [] };
+
+      let votersRes = await rpc('admin_get_voters', {
+        p_token: adminToken,
+        p_limit: 1500,
+        p_offset: 0,
+        p_search: ''
+      });
+      if (!votersRes || !votersRes.ok) {
+        await ensureAuth(true);
+        votersRes = await rpc('admin_get_voters', {
+          p_token: adminToken,
+          p_limit: 1500,
+          p_offset: 0,
+          p_search: ''
+        });
+      }
+      const voters = votersRes?.data?.rows || [];
+
+      // Kelompokkan partisipasi per kelas
+      const classMap = {};
+      const genderMap = {};
+
+      voters.forEach(v => {
+        // Kelas
+        const cls = v.class || 'Lainnya';
+        if (!classMap[cls]) classMap[cls] = { class_name: cls, voted: 0, not_voted: 0, total: 0 };
+        classMap[cls].total++;
+        if (v.has_voted) classMap[cls].voted++;
+        else classMap[cls].not_voted++;
+
+        // Gender
+        const rawG = (v.gender || '').trim().toLowerCase();
+        const gName = rawG.startsWith('l') ? 'Laki-laki' : (rawG.startsWith('p') ? 'Perempuan' : 'Lainnya');
+        if (!genderMap[gName]) genderMap[gName] = { gender: gName, voted: 0, not_voted: 0, total: 0, pct: 0 };
+        genderMap[gName].total++;
+        if (v.has_voted) genderMap[gName].voted++;
+        else genderMap[gName].not_voted++;
+      });
+
+      const partClass = Object.values(classMap).sort((a, b) => a.class_name.localeCompare(b.class_name, undefined, { numeric: true }));
+      
+      const partGender = Object.values(genderMap).map(g => {
+        g.pct = g.total > 0 ? Number(((g.voted / g.total) * 100).toFixed(1)) : 0;
+        return g;
+      });
+
+      const candVotes = (qcData.candidates || []).map(c => ({
+        id: c.id,
+        number: c.number,
+        name: c.name,
+        chairman: c.chairman,
+        vice_chairman: c.vice_chairman,
+        photo_url: c.photo_url,
+        vote_count: c.vote_count || 0
+      }));
+
+      const hourMap = {};
+      voters.forEach(v => {
+        if (v.has_voted && v.voted_at) {
+          const d = new Date(v.voted_at);
+          const hr = String(d.getHours()).padStart(2, '0');
+          hourMap[hr] = (hourMap[hr] || 0) + 1;
+        }
+      });
+      const trend = Object.keys(hourMap).sort().map(hr => ({
+        hour: hr,
+        vote_count: hourMap[hr]
+      }));
+
+      return {
+        total_voters: qcData.total_voters || voters.length,
+        total_votes: qcData.total_votes || voters.filter(v => v.has_voted).length,
+        candidates_votes: candVotes,
+        participation_by_class: partClass,
+        votes_by_class_candidate: [],
+        votes_by_gender_candidate: [],
+        participation_by_gender: partGender,
+        votes_per_hour: trend.length > 0 ? trend : [{ hour: '08', vote_count: qcData.total_votes || 0 }]
+      };
+    }
+
+    // ─── Load Analytics Data ───────────────────────────────────────────────────
+    async function loadAnalytics() {
+      const btn = $('btn-reload');
+      const btnText = $('btn-reload-text');
+      if (btn) btn.disabled = true;
+      if (btnText) btnText.textContent = 'Memuat...';
+
+      try {
+        if (!isValidUUID(adminToken)) await ensureAuth(true);
+
+        let data = null;
+        let result = await rpc('admin_analytics', { p_token: adminToken });
+        
+        if (!result || !result.ok) {
+          await ensureAuth(true);
+          result = await rpc('admin_analytics', { p_token: adminToken });
+        }
+
+        if (result && result.ok && result.data) {
+          data = result.data;
+        } else {
+          console.warn('Menggunakan kalkulasi analitik fallback:', result?.error);
+          data = await buildAnalyticsFallback();
+        }
+
+        if (!data) throw new Error('Tidak dapat memperoleh data analitik.');
+
+        // Cek jika field gender belum dikembalikan oleh function database lama
+        if (!data.votes_by_gender_candidate || !data.participation_by_gender) {
+          $('banner-sql-hint').style.display = 'flex';
+          const fallback = await buildAnalyticsFallback();
+          data.participation_by_gender = data.participation_by_gender || fallback.participation_by_gender;
+          data.votes_by_gender_candidate = data.votes_by_gender_candidate || [];
+        } else {
+          $('banner-sql-hint').style.display = 'none';
+        }
+
+        currentAnalyticsData = data;
+        destroyCharts();
+
+        try { renderStats(data); } catch(e) { console.error('Stat render error:', e); }
+        try { renderChartGenderPie(data, currentGenderPieFilter); } catch(e) { console.error('Gender pie error:', e); }
+        try { renderChartGenderBar(data); } catch(e) { console.error('Gender bar error:', e); }
+        try { renderGenderTable(data); } catch(e) { console.error('Gender table error:', e); }
+        try { renderChartCandidates(data); } catch(e) { console.error('Candidates error:', e); }
+        try { renderChartParticipation(data); } catch(e) { console.error('Participation error:', e); }
+        try { renderChartVotesPerClass(data); } catch(e) { console.error('Votes per class error:', e); }
+        try { renderChartTrend(data); } catch(e) { console.error('Trend error:', e); }
+
+      } catch(err) {
+        console.error('Error load analytics:', err);
+      } finally {
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.textContent = 'Segarkan Data';
+      }
+    }
+
+    $('btn-reload').addEventListener('click', loadAnalytics);
+
+    // Event listener pill gender pie
+    ['btn-gender-l', 'btn-gender-p', 'btn-gender-all'].forEach(id => {
+      const el = $(id);
+      if (el) {
+        el.addEventListener('click', () => {
+          document.querySelectorAll('[data-gender]').forEach(b => b.classList.remove('active'));
+          el.classList.add('active');
+          const gender = el.dataset.gender;
+          if (currentAnalyticsData) {
+            renderChartGenderPie(currentAnalyticsData, gender);
+          }
+        });
+      }
+    });
+
+    // Event listener switch mode persentase vs jumlah suara kelas
+    const btnPct = $('btn-chart-pct');
+    const btnCount = $('btn-chart-count');
+
+    if (btnPct && btnCount) {
+      btnPct.addEventListener('click', () => {
+        if (currentClassChartMode === 'pct') return;
+        currentClassChartMode = 'pct';
+        btnPct.classList.add('active');
+        btnCount.classList.remove('active');
+        if (currentAnalyticsData) renderChartVotesPerClass(currentAnalyticsData);
+      });
+
+      btnCount.addEventListener('click', () => {
+        if (currentClassChartMode === 'count') return;
+        currentClassChartMode = 'count';
+        btnCount.classList.add('active');
+        btnPct.classList.remove('active');
+        if (currentAnalyticsData) renderChartVotesPerClass(currentAnalyticsData);
+      });
+    }
+
+    // Auto load saat pertama kali dibuka
+    (async () => {
+      await ensureAuth(true);
+      await loadAnalytics();
+    })();
+  </script>
+</body>
+</html>
