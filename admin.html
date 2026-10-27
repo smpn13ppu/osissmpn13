@@ -853,7 +853,8 @@
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
               <button class="btn btn-secondary btn-sm" id="btn-quick-goto-laporan" type="button" style="display: inline-flex; align-items: center; gap: 6px;">
-                <span>Buka Panel Laporan &rarr;</span>
+                <span>Buka Panel Laporan</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
               </button>
               <button class="btn btn-primary btn-sm" id="btn-quick-print" type="button" style="display: inline-flex; align-items: center; gap: 6px;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
@@ -993,12 +994,12 @@
             <div style="display: flex; align-items: center; gap: 8px;">
               <label for="voter-sort-select" style="font-size: 13px; font-weight: 600; color: var(--color-deep-space); white-space: nowrap;">Urutkan:</label>
               <select class="input input-sm" id="voter-sort-select" style="padding: 6px 12px; font-size: 13px; width: auto; min-width: 180px; border-radius: var(--radius-input);">
-                <option value="name_asc">Nama (A &rarr; Z)</option>
-                <option value="name_desc">Nama (Z &rarr; A)</option>
-                <option value="class_asc">Kelas (Kecil &rarr; Besar)</option>
-                <option value="class_desc">Kelas (Besar &rarr; Kecil)</option>
-                <option value="nisn_asc">NISN (Kecil &rarr; Besar)</option>
-                <option value="nisn_desc">NISN (Besar &rarr; Kecil)</option>
+                <option value="name_asc">Nama (A - Z)</option>
+                <option value="name_desc">Nama (Z - A)</option>
+                <option value="class_asc">Kelas (Kecil - Besar)</option>
+                <option value="class_desc">Kelas (Besar - Kecil)</option>
+                <option value="nisn_asc">NISN (Terkecil - Terbesar)</option>
+                <option value="nisn_desc">NISN (Terbesar - Terkecil)</option>
                 <option value="status_notvoted">Belum Memilih Dahulu</option>
                 <option value="status_voted">Sudah Memilih Dahulu</option>
               </select>
@@ -1028,22 +1029,22 @@
                     <input type="checkbox" id="check-all-voters" title="Pilih semua pemilih di halaman ini" aria-label="Pilih semua pemilih" />
                   </th>
                   <th scope="col" class="sortable" data-sort="nisn" title="Klik untuk mengurutkan berdasarkan NISN">
-                    NISN <span class="sort-icon" id="icon-sort-nisn">↕</span>
+                    NISN <span class="sort-icon" id="icon-sort-nisn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span>
                   </th>
                   <th scope="col" class="sortable sort-active" data-sort="name" title="Klik untuk mengurutkan berdasarkan Nama">
-                    Nama Siswa <span class="sort-icon" id="icon-sort-name">▲</span>
+                    Nama Siswa <span class="sort-icon" id="icon-sort-name"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></span>
                   </th>
                   <th scope="col" class="sortable" data-sort="class" title="Klik untuk mengurutkan berdasarkan Kelas">
-                    Kelas <span class="sort-icon" id="icon-sort-class">↕</span>
+                    Kelas <span class="sort-icon" id="icon-sort-class"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span>
                   </th>
                   <th scope="col" class="sortable" data-sort="gender" title="Klik untuk mengurutkan berdasarkan Jenis Kelamin">
-                    Jenis Kelamin <span class="sort-icon" id="icon-sort-gender">↕</span>
+                    Jenis Kelamin <span class="sort-icon" id="icon-sort-gender"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span>
                   </th>
                   <th scope="col" class="sortable" data-sort="religion" title="Klik untuk mengurutkan berdasarkan Agama">
-                    Agama <span class="sort-icon" id="icon-sort-religion">↕</span>
+                    Agama <span class="sort-icon" id="icon-sort-religion"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span>
                   </th>
                   <th scope="col" class="sortable" data-sort="status" title="Klik untuk mengurutkan berdasarkan Status Memilih">
-                    Status <span class="sort-icon" id="icon-sort-status">↕</span>
+                    Status <span class="sort-icon" id="icon-sort-status"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></span>
                   </th>
                   <th scope="col" style="text-align: center;">Aksi</th>
                 </tr>
@@ -1140,10 +1141,14 @@
         </div>
 
         <!-- Pengaturan Identitas Berita Acara (Opsional untuk Penyesuaian Nama/NIP) -->
-        <details class="card mb-6" style="padding: 16px 20px;">
-          <summary style="cursor: pointer; font-weight: 600; font-size: var(--text-small); color: var(--color-steel-blue); display: flex; align-items: center; justify-content: space-between;">
-            <span>⚙️ Sesuaikan Pejabat Penandatangan &amp; Nomor Surat Dokumen</span>
-            <span style="font-size: 11px; font-weight: normal; color: rgba(0,48,73,0.6);">Klik untuk mengubah nama / NIP</span>
+        <!-- Pengaturan Identitas Berita Acara (Simpan Nama/NIP ke Penyimpanan) -->
+        <details class="card mb-6" style="padding: 16px 20px;" id="details-doc-config">
+          <summary style="cursor: pointer; font-weight: 600; font-size: var(--text-small); color: var(--color-steel-blue); display: flex; align-items: center; justify-content: space-between; user-select: none;">
+            <span style="display: inline-flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-steel-blue); flex-shrink: 0;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+              <span>Sesuaikan Pejabat Penandatangan &amp; Nomor Surat Dokumen</span>
+            </span>
+            <span style="font-size: 11px; font-weight: normal; color: rgba(0,48,73,0.6);">Klik untuk mengubah &amp; menyimpan data</span>
           </summary>
           <div style="margin-top: 14px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 13px;">
             <div class="input-group">
@@ -1173,6 +1178,24 @@
             <div class="input-group col-span-2">
               <label class="input-label" for="cfg-doc-panitia">Nama Ketua Panitia Pemilihan Siswa</label>
               <input type="text" id="cfg-doc-panitia" class="input input-sm" value="Aura Kasih Ramadhani (Ketua Panitia Pemilihan)" />
+            </div>
+          </div>
+
+          <!-- Tombol Aksi Simpan & Reset Pengaturan Dokumen -->
+          <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" class="btn btn-primary btn-sm" id="btn-save-doc-config" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                <span>Simpan Pengaturan Dokumen</span>
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-doc-config" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                <span>Kembalikan Default</span>
+              </button>
+            </div>
+            <div id="doc-config-status" style="font-size: 11.5px; color: var(--color-steel-blue); display: inline-flex; align-items: center; gap: 5px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+              <span id="doc-config-status-text">Data disimpan otomatis ke peramban</span>
             </div>
           </div>
         </details>
@@ -1209,12 +1232,18 @@
           <a href="quickcount.html" target="_blank" rel="noopener" class="card link-card" aria-label="Buka halaman Quick Count">
             <p class="link-card-title">Quick Count Real-time</p>
             <p class="link-card-desc">Layar hasil sementara untuk ditampilkan di proyektor. Diperbarui otomatis setiap 3 detik.</p>
-            <p style="margin-top: 12px; font-size: var(--text-small); color: var(--color-steel-blue);">Buka Quick Count &rarr;</p>
+            <p style="margin-top: 12px; font-size: var(--text-small); color: var(--color-steel-blue); display: inline-flex; align-items: center; gap: 4px;">
+              <span>Buka Quick Count</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </p>
           </a>
           <a href="analytics.html" target="_blank" rel="noopener" class="card link-card" aria-label="Buka halaman Analitik">
             <p class="link-card-title">Dashboard Analitik</p>
             <p class="link-card-desc">Analisis mendalam: perolehan suara, partisipasi per kelas, dan tren suara per jam.</p>
-            <p style="margin-top: 12px; font-size: var(--text-small); color: var(--color-steel-blue);">Buka Analitik &rarr;</p>
+            <p style="margin-top: 12px; font-size: var(--text-small); color: var(--color-steel-blue); display: inline-flex; align-items: center; gap: 4px;">
+              <span>Buka Analitik</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </p>
           </a>
         </div>
       </div>
@@ -1505,7 +1534,10 @@
         }
       }
 
-      // 2. Langsung muat tab kontrol
+      // 2. Muat pengaturan dokumen yang tersimpan
+      populateDocConfigInputs();
+
+      // 3. Langsung muat tab kontrol
       await loadTab(currentTab);
     }
 
@@ -1864,7 +1896,7 @@
         setCandidatePhotoPreview(
           res.dataUrl,
           `Ukuran: ${res.sizeKb} KB (Maks 100 KB)`,
-          `Asli: ${res.originalSizeKb} KB → Berhasil dikompresi`
+          `Asli: ${res.originalSizeKb} KB • Berhasil dikompresi`
         );
         showToast(`Foto berhasil dikompresi (${res.sizeKb} KB)`, 'success');
       } catch (err) {
@@ -2065,6 +2097,12 @@
       });
     }
 
+    const SORT_ICONS = {
+      neutral: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg>',
+      asc: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>',
+      desc: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>'
+    };
+
     function applySort(col, dir = null) {
       if (dir) {
         currentSortCol = col;
@@ -2086,10 +2124,10 @@
 
         if (c === currentSortCol) {
           th.classList.add('sort-active');
-          icon.textContent = currentSortDir === 'asc' ? '▲' : '▼';
+          icon.innerHTML = currentSortDir === 'asc' ? SORT_ICONS.asc : SORT_ICONS.desc;
         } else {
           th.classList.remove('sort-active');
-          icon.textContent = '↕';
+          icon.innerHTML = SORT_ICONS.neutral;
         }
       });
 
@@ -2640,8 +2678,9 @@
         }
 
         importStatus.innerHTML = `
-          <span style="color:var(--color-success-text); font-weight:500;">
-            ✓ Berkas berhasil dibaca: <strong>${stagedVoters.length} data pemilih</strong> terdeteksi lengkap (NISN, Nama, Kelas, Jenis Kelamin, Agama). Silakan klik tombol <strong>"Mulai Impor Data"</strong> untuk menyimpan ke database.
+          <span style="color:var(--color-success-text); font-weight:500; display:inline-flex; align-items:center; gap:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <span>Berkas berhasil dibaca: <strong>${stagedVoters.length} data pemilih</strong> terdeteksi lengkap (NISN, Nama, Kelas, Jenis Kelamin, Agama). Silakan klik tombol <strong>"Mulai Impor Data"</strong> untuk menyimpan ke database.</span>
           </span>`;
 
       } catch(err) {
@@ -2676,8 +2715,9 @@
           const importedCount = result.data?.imported ?? stagedVoters.length;
           showToast(`Berhasil mengimpor ${importedCount} pemilih!`, 'success');
           importStatus.innerHTML = `
-            <span style="color:var(--color-success-text); font-weight:600;">
-              ✓ Sukses! Sebanyak ${importedCount} data pemilih berhasil diimpor ke dalam Daftar Pemilih Tetap (DPT).
+            <span style="color:var(--color-success-text); font-weight:600; display:inline-flex; align-items:center; gap:6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <span>Sukses! Sebanyak ${importedCount} data pemilih berhasil diimpor ke dalam Daftar Pemilih Tetap (DPT).</span>
             </span>`;
           
           votersPage = 0;
@@ -2756,8 +2796,93 @@
       return null;
     }
 
+    // Konfigurasi Standar Pejabat & Berita Acara
+    const DEFAULT_DOC_CONFIG = {
+      nomor: '421.3 / 085 / OSIS-SMPN13 / X / 2026',
+      lokasi: 'UPTD SMP Negeri 13 Penajam Paser Utara',
+      kepsek: 'Drs. H. M. Syahrir, M.Pd.',
+      nipKepsek: '19680512 199412 1 002',
+      pembina: 'Bambang Sutejo, S.Pd.',
+      nipPembina: 'NIP. 19820315 200801 1 011',
+      panitia: 'Aura Kasih Ramadhani (Ketua Panitia Pemilihan)'
+    };
+
+    function getDocConfig() {
+      try {
+        const saved = localStorage.getItem('osis_doc_config');
+        if (saved) {
+          return { ...DEFAULT_DOC_CONFIG, ...JSON.parse(saved) };
+        }
+      } catch (e) {
+        console.warn('Gagal membaca osis_doc_config:', e);
+      }
+      return { ...DEFAULT_DOC_CONFIG };
+    }
+
+    function populateDocConfigInputs() {
+      const cfg = getDocConfig();
+      if ($('cfg-doc-nomor')) $('cfg-doc-nomor').value = cfg.nomor;
+      if ($('cfg-doc-lokasi')) $('cfg-doc-lokasi').value = cfg.lokasi;
+      if ($('cfg-doc-kepsek')) $('cfg-doc-kepsek').value = cfg.kepsek;
+      if ($('cfg-doc-nip-kepsek')) $('cfg-doc-nip-kepsek').value = cfg.nipKepsek;
+      if ($('cfg-doc-pembina')) $('cfg-doc-pembina').value = cfg.pembina;
+      if ($('cfg-doc-nip-pembina')) $('cfg-doc-nip-pembina').value = cfg.nipPembina;
+      if ($('cfg-doc-panitia')) $('cfg-doc-panitia').value = cfg.panitia;
+    }
+
+    function saveDocConfig(showToastNotice = true) {
+      const cfg = {
+        nomor: $('cfg-doc-nomor')?.value.trim() || DEFAULT_DOC_CONFIG.nomor,
+        lokasi: $('cfg-doc-lokasi')?.value.trim() || DEFAULT_DOC_CONFIG.lokasi,
+        kepsek: $('cfg-doc-kepsek')?.value.trim() || DEFAULT_DOC_CONFIG.kepsek,
+        nipKepsek: $('cfg-doc-nip-kepsek')?.value.trim() || DEFAULT_DOC_CONFIG.nipKepsek,
+        pembina: $('cfg-doc-pembina')?.value.trim() || DEFAULT_DOC_CONFIG.pembina,
+        nipPembina: $('cfg-doc-nip-pembina')?.value.trim() || DEFAULT_DOC_CONFIG.nipPembina,
+        panitia: $('cfg-doc-panitia')?.value.trim() || DEFAULT_DOC_CONFIG.panitia
+      };
+      try {
+        localStorage.setItem('osis_doc_config', JSON.stringify(cfg));
+      } catch (e) {
+        console.warn('Gagal menyimpan osis_doc_config:', e);
+      }
+      if (cachedAnalyticsData) {
+        renderBeritaAcaraDocument();
+      }
+      const statusEl = $('doc-config-status-text');
+      if (statusEl) {
+        statusEl.textContent = 'Perubahan data pejabat & nomor surat berhasil disimpan!';
+        statusEl.parentElement.style.color = 'var(--color-success-text)';
+        setTimeout(() => {
+          if (statusEl) {
+            statusEl.textContent = 'Data disimpan otomatis ke peramban';
+            statusEl.parentElement.style.color = 'var(--color-steel-blue)';
+          }
+        }, 3000);
+      }
+      if (showToastNotice) {
+        showToast('Pengaturan pejabat & nomor surat berhasil disimpan!', 'success');
+      }
+    }
+
+    function resetDocConfig() {
+      try {
+        localStorage.removeItem('osis_doc_config');
+      } catch (e) {}
+      populateDocConfigInputs();
+      if (cachedAnalyticsData) {
+        renderBeritaAcaraDocument();
+      }
+      const statusEl = $('doc-config-status-text');
+      if (statusEl) {
+        statusEl.textContent = 'Pengaturan dikembalikan ke format standar.';
+        statusEl.parentElement.style.color = 'var(--color-steel-blue)';
+      }
+      showToast('Pengaturan dokumen dikembalikan ke default.', 'info');
+    }
+
     // Muat Tab Laporan
     async function loadLaporan() {
+      populateDocConfigInputs();
       const docEl = $('berita-acara-doc');
       if (docEl) {
         docEl.innerHTML = '<div style="text-align:center; padding: 48px; color: rgba(0,48,73,0.65);"><p style="font-weight:600; margin-bottom:6px;">Mengambil data pemilihan terbaru...</p><p style="font-size:12px;">Menyusun rekapitulasi perolehan suara dan dokumen Berita Acara.</p></div>';
@@ -2812,14 +2937,15 @@
       const partPct = totalVoters > 0 ? ((totalVotes / totalVoters) * 100).toFixed(1) : '0.0';
       const notVotedPct = totalVoters > 0 ? ((notVoted / totalVoters) * 100).toFixed(1) : '0.0';
 
-      // Ambil nilai konfigurasi pejabat dari form (atau gunakan default)
-      const docNomor = $('cfg-doc-nomor')?.value.trim() || '421.3 / 085 / OSIS-SMPN13 / X / 2026';
-      const docLokasi = $('cfg-doc-lokasi')?.value.trim() || 'UPTD SMP Negeri 13 Penajam Paser Utara';
-      const docKepsek = $('cfg-doc-kepsek')?.value.trim() || 'Drs. H. M. Syahrir, M.Pd.';
-      const docNipKepsek = $('cfg-doc-nip-kepsek')?.value.trim() || '19680512 199412 1 002';
-      const docPembina = $('cfg-doc-pembina')?.value.trim() || 'Bambang Sutejo, S.Pd.';
-      const docNipPembina = $('cfg-doc-nip-pembina')?.value.trim() || 'NIP. 19820315 200801 1 011';
-      const docPanitia = $('cfg-doc-panitia')?.value.trim() || 'Aura Kasih Ramadhani (Ketua Panitia Pemilihan)';
+      // Ambil nilai konfigurasi pejabat dari input aktif atau penyimpanan lokal
+      const activeCfg = getDocConfig();
+      const docNomor = $('cfg-doc-nomor')?.value.trim() || activeCfg.nomor;
+      const docLokasi = $('cfg-doc-lokasi')?.value.trim() || activeCfg.lokasi;
+      const docKepsek = $('cfg-doc-kepsek')?.value.trim() || activeCfg.kepsek;
+      const docNipKepsek = $('cfg-doc-nip-kepsek')?.value.trim() || activeCfg.nipKepsek;
+      const docPembina = $('cfg-doc-pembina')?.value.trim() || activeCfg.pembina;
+      const docNipPembina = $('cfg-doc-nip-pembina')?.value.trim() || activeCfg.nipPembina;
+      const docPanitia = $('cfg-doc-panitia')?.value.trim() || activeCfg.panitia;
 
       // Tanggal Bahasa Indonesia
       const sekarang = new Date();
@@ -2868,7 +2994,7 @@
               <td style="font-size:11.5px; font-style:italic;">${angkaKeTerbilang(vCount)} Suara</td>
               <td style="text-align:center; font-weight:700;">${pct}%</td>
               <td style="text-align:center; font-size:11.5px;">
-                ${isHighest ? (isClosed ? '<span style="font-weight:700; color:#1e6b3a;">★ TERPILIH</span>' : '<span style="font-weight:700; color:#003049;">Unggul Sementara</span>') : '—'}
+                ${isHighest ? (isClosed ? '<span style="display:inline-flex; align-items:center; gap:4px; font-weight:700; color:#1e6b3a;"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>TERPILIH</span>' : '<span style="display:inline-flex; align-items:center; gap:4px; font-weight:700; color:#003049;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>Unggul Sementara</span>') : '—'}
               </td>
             </tr>
           `;
@@ -2931,8 +3057,10 @@
 
         winnerBoxHtml = `
           <div class="doc-winner-box page-break-avoid">
-            <div class="doc-winner-title">
-              ${isClosed ? '★ PASANGAN CALON TERPILIH KETUA & WAKIL KETUA OSIS ★' : '★ PASANGAN CALON DENGAN PEROLEHAN SUARA TERBANYAK (SEMENTARA) ★'}
+            <div class="doc-winner-title" style="display:flex; align-items:center; justify-content:center; gap:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              <span>${isClosed ? 'PASANGAN CALON TERPILIH KETUA & WAKIL KETUA OSIS' : 'PASANGAN CALON PEROLEHAN SUARA TERBANYAK (SEMENTARA)'}</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             </div>
             <div class="doc-winner-name">
               PASANGAN CALON NOMOR URUT ${escHtml(winner.number)}
@@ -3377,10 +3505,14 @@
     $('btn-export-csv-rekap')?.addEventListener('click', exportRekapCsv);
     $('btn-export-csv-dpt')?.addEventListener('click', exportDptCsv);
 
-    // Live update saat input konfigurasi dokumen diubah
+    // Pengaturan Konfigurasi Dokumen (Simpan & Reset)
+    $('btn-save-doc-config')?.addEventListener('click', () => saveDocConfig(true));
+    $('btn-reset-doc-config')?.addEventListener('click', resetDocConfig);
+
+    // Live update & auto-save saat input konfigurasi dokumen diubah
     ['cfg-doc-nomor', 'cfg-doc-lokasi', 'cfg-doc-kepsek', 'cfg-doc-nip-kepsek', 'cfg-doc-pembina', 'cfg-doc-nip-pembina', 'cfg-doc-panitia'].forEach(id => {
       $(id)?.addEventListener('input', () => {
-        if (cachedAnalyticsData) renderBeritaAcaraDocument();
+        saveDocConfig(false);
       });
     });
 
